@@ -29,6 +29,9 @@
   "umdGlobals": {
     "slate": "Slate"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "keywords": [
     "editor",
     "history",

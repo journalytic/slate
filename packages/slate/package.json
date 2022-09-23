@@ -24,6 +24,9 @@
     "slate-hyperscript": "^0.81.3",
     "source-map-loader": "^4.0.0"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "keywords": [
     "canvas",
     "contenteditable",
