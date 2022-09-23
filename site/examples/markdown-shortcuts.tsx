@@ -10,7 +10,12 @@ import {
   Transforms,
 } from '@journalytic/slate'
 import { withHistory } from '@journalytic/slate-history'
-import { Editable, ReactEditor, Slate, withReact } from '@journalytic/slate-react'
+import {
+  Editable,
+  ReactEditor,
+  Slate,
+  withReact,
+} from '@journalytic/slate-react'
 import { BulletedListElement } from './custom-types'
 
 const SHORTCUTS = {

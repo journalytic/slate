@@ -1,5 +1,11 @@
 import React from 'react'
-import { Editor, Range, Element, Ancestor, Descendant } from '@journalytic/slate'
+import {
+  Editor,
+  Range,
+  Element,
+  Ancestor,
+  Descendant,
+} from '@journalytic/slate'
 
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'

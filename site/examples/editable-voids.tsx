@@ -1,6 +1,11 @@
 import React, { useState, useMemo } from 'react'
 import { Transforms, createEditor, Descendant } from '@journalytic/slate'
-import { Slate, Editable, useSlateStatic, withReact } from '@journalytic/slate-react'
+import {
+  Slate,
+  Editable,
+  useSlateStatic,
+  withReact,
+} from '@journalytic/slate-react'
 import { withHistory } from '@journalytic/slate-history'
 import { css } from '@emotion/css'
 

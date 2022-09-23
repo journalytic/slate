@@ -2,7 +2,12 @@ import React, { useMemo } from 'react'
 import isUrl from 'is-url'
 import { isKeyHotkey } from 'is-hotkey'
 import { css } from '@emotion/css'
-import { Editable, withReact, useSlate, useSelected } from '@journalytic/slate-react'
+import {
+  Editable,
+  withReact,
+  useSlate,
+  useSelected,
+} from '@journalytic/slate-react'
 import * as SlateReact from '@journalytic/slate-react'
 import {
   Transforms,

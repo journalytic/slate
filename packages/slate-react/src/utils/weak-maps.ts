@@ -1,4 +1,11 @@
-import { Ancestor, Editor, Node, Range, RangeRef, Text } from '@journalytic/slate'
+import {
+  Ancestor,
+  Editor,
+  Node,
+  Range,
+  RangeRef,
+  Text,
+} from '@journalytic/slate'
 import { Action } from '../hooks/android-input-manager/android-input-manager'
 import { TextDiff } from './diff-text'
 import { Key } from './key'

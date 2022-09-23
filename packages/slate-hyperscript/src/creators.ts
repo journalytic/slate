@@ -1,4 +1,11 @@
-import { Element, Descendant, Node, Range, Text, Editor } from '@journalytic/slate'
+import {
+  Element,
+  Descendant,
+  Node,
+  Range,
+  Text,
+  Editor,
+} from '@journalytic/slate'
 import {
   AnchorToken,
   FocusToken,

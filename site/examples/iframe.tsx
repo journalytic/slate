@@ -1,7 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate, Slate, ReactEditor } from '@journalytic/slate-react'
+import {
+  Editable,
+  withReact,
+  useSlate,
+  Slate,
+  ReactEditor,
+} from '@journalytic/slate-react'
 import { Editor, createEditor, Descendant } from '@journalytic/slate'
 import { withHistory } from '@journalytic/slate-history'
 
