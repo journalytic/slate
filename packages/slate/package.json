@@ -3,7 +3,7 @@
   "description": "A completely customizable framework for building rich text editors.",
   "version": "0.82.0",
   "license": "MIT",
-  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -20,8 +20,8 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
+    "@journalytic/slate-hyperscript": "^0.81.3",
     "lodash": "^4.17.21",
-    "slate-hyperscript": "^0.81.3",
     "source-map-loader": "^4.0.0"
   },
   "publishConfig": {
