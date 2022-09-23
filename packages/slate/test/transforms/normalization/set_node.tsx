@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor, Element, Transforms } from 'slate'
+import { Editor, Element, Transforms } from '@journalytic/slate'
 import { jsx } from '../..'
 import _ from 'lodash'
 

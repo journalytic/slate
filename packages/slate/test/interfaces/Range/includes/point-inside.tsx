@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import { Range } from '@journalytic/slate'
 
 export const input = {
   range: {

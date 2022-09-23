@@ -1,4 +1,4 @@
-import { BaseEditor, Editor } from 'slate'
+import { BaseEditor, Editor } from '@journalytic/slate'
 import { History } from './history'
 
 /**

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '../..'
-import { Editor, Element, Transforms } from 'slate'
+import { Editor, Element, Transforms } from '@journalytic/slate'
 
 export const input = (
   <editor>

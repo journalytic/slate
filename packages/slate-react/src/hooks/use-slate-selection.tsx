@@ -1,4 +1,4 @@
-import { BaseSelection, Range } from 'slate'
+import { BaseSelection, Range } from '@journalytic/slate'
 
 import { useSlateSelector } from './use-slate-selector'
 

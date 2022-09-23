@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Element, Range, Text as SlateText } from 'slate'
+import { Element, Range, Text as SlateText } from '@journalytic/slate'
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { isDecoratorRangeListEqual } from '../utils/range-list'

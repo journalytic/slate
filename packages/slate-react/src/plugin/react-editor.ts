@@ -7,7 +7,7 @@ import {
   Range,
   Scrubber,
   Transforms,
-} from 'slate'
+} from '@journalytic/slate'
 
 import { Key } from '../utils/key'
 import {

@@ -6,8 +6,8 @@ import {
   Point,
   Range,
   Transforms,
-} from 'slate'
-import { withHistory } from 'slate-history'
+} from '@journalytic/slate'
+import { withHistory } from '@journalytic/slate-history'
 import {
   Editable,
   ReactEditor,
@@ -15,7 +15,7 @@ import {
   useFocused,
   useSelected,
   withReact,
-} from 'slate-react'
+} from '@journalytic/slate-react'
 import { Portal } from '../components'
 import { MentionElement } from './custom-types'
 

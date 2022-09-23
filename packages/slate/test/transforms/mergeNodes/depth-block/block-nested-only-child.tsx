@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '../../..'
-import { Transforms } from 'slate'
+import { Transforms } from '@journalytic/slate'
 
 export const run = editor => {
   Transforms.mergeNodes(editor, {

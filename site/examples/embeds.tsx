@@ -4,14 +4,14 @@ import {
   createEditor,
   Element as SlateElement,
   Descendant,
-} from 'slate'
+} from '@journalytic/slate'
 import {
   Slate,
   Editable,
   withReact,
   useSlateStatic,
   ReactEditor,
-} from 'slate-react'
+} from '@journalytic/slate-react'
 
 const EmbedsExample = () => {
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])

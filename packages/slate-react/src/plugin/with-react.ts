@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Operation, Path, Point, Range, Transforms } from 'slate'
+import { Editor, Node, Operation, Path, Point, Range, Transforms } from '@journalytic/slate'
 import {
   TextDiff,
   transformPendingPoint,

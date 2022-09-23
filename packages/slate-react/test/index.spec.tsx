@@ -1,5 +1,5 @@
 import React from 'react'
-import { createEditor, Element, Transforms } from 'slate'
+import { createEditor, Element, Transforms } from '@journalytic/slate'
 import { create, act, ReactTestRenderer } from 'react-test-renderer'
 import { Slate, withReact, Editable } from '../src'
 

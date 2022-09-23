@@ -5,7 +5,7 @@ import {
   BaseRange,
   Descendant,
   Operation,
-} from 'slate'
+} from '@journalytic/slate'
 
 export type HeadingElement = {
   type: 'heading'

@@ -1,5 +1,5 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
+import { Editor, Node, Path, Point, Range, Text, Transforms } from '@journalytic/slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
   mergeStringDiffs,

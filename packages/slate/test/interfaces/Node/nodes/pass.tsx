@@ -1,5 +1,5 @@
 /** @jsx jsx  */
-import { Node } from 'slate'
+import { Node } from '@journalytic/slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (

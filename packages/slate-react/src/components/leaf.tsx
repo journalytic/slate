@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import { Element, Text } from 'slate'
+import { Element, Text } from '@journalytic/slate'
 import String from './string'
 import {
   PLACEHOLDER_SYMBOL,

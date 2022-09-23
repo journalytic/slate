@@ -1,4 +1,4 @@
-import { Editor, Node, Operation, Path, Point, Range, Text } from 'slate'
+import { Editor, Node, Operation, Path, Point, Range, Text } from '@journalytic/slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
 export type StringDiff = {

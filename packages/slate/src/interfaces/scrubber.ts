@@ -15,7 +15,7 @@ let _scrubber: Scrubber | undefined = undefined
  *
  * For example, to prevent the cleartext logging of 'text' fields within Nodes:
  *
- *    import { Scrubber } from 'slate';
+ *    import { Scrubber } from '@journalytic/slate';
  *    Scrubber.setScrubber((key, val) => {
  *      if (key === 'text') return '...scrubbed...'
  *      return val

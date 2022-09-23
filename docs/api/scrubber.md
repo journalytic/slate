@@ -15,7 +15,7 @@ Here's an example of recursively scrubbing the `'text'` fields of any entity
 that gets logged.
 
 ```typescript
-import { Scrubber } from 'slate'
+import { Scrubber } from '@journalytic/slate'
 
 Scrubber.setScrubber((key, value) => {
   if (key === 'text') return '... scrubbed ...'
@@ -37,7 +37,7 @@ of Nodes, preserving their length, but replacing their contents with randomly
 chosen alphanumeric characters.
 
 ```typescript
-import { Scrubber } from 'slate'
+import { Scrubber } from '@journalytic/slate'
 
 const textRandomizer = (fieldNames: string[]) => (key, value) => {
   if (fieldNames.includes(key)) {

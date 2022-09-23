@@ -1,4 +1,4 @@
-import { Point } from 'slate'
+import { Point } from '@journalytic/slate'
 
 export const input = [0, 1]
 export const test = value => {

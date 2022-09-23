@@ -6,9 +6,9 @@ import {
   Editor,
   Descendant,
   BaseEditor,
-} from 'slate'
-import { ReactEditor } from 'slate-react'
-import { HistoryEditor } from 'slate-history'
+} from '@journalytic/slate'
+import { ReactEditor } from '@journalytic/slate-react'
+import { HistoryEditor } from '@journalytic/slate-history'
 
 export type BlockQuoteElement = {
   type: 'block-quote'

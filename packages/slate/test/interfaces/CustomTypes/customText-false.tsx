@@ -1,4 +1,4 @@
-import { Text } from 'slate'
+import { Text } from '@journalytic/slate'
 import { isCustomText } from './type-guards'
 
 export const input: Text = {

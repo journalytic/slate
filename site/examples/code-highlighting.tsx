@@ -4,9 +4,9 @@ import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import React, { useState, useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
-import { Text, createEditor, Element as SlateElement, Descendant } from 'slate'
-import { withHistory } from 'slate-history'
+import { Slate, Editable, withReact } from '@journalytic/slate-react'
+import { Text, createEditor, Element as SlateElement, Descendant } from '@journalytic/slate'
+import { withHistory } from '@journalytic/slate-history'
 import { css } from '@emotion/css'
 
 const CodeHighlightingExample = () => {

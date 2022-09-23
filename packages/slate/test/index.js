@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
-import { Editor } from 'slate'
+import { Editor } from '@journalytic/slate'
 import { createHyperscript } from 'slate-hyperscript'
 
 describe('slate', () => {

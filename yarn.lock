@@ -2258,26 +2258,26 @@ __metadata:
   resolution: "@journalytic/slate-history@workspace:packages/slate-history"
   dependencies:
     "@babel/runtime": ^7.7.4
+    "@journalytic/slate": ^0.82.0
+    "@journalytic/slate-hyperscript": ^0.81.3
     is-plain-object: ^5.0.0
     lodash: ^4.17.21
-    slate: ^0.82.0
-    slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
   peerDependencies:
-    slate: ">=0.65.3"
+    "@journalytic/slate": ">=0.65.3"
   languageName: unknown
   linkType: soft
 
-"@journalytic/slate-hyperscript@*, @journalytic/slate-hyperscript@workspace:packages/slate-hyperscript":
+"@journalytic/slate-hyperscript@*, @journalytic/slate-hyperscript@^0.81.3, @journalytic/slate-hyperscript@workspace:packages/slate-hyperscript":
   version: 0.0.0-use.local
   resolution: "@journalytic/slate-hyperscript@workspace:packages/slate-hyperscript"
   dependencies:
     "@babel/runtime": ^7.7.4
+    "@journalytic/slate": ^0.82.0
     is-plain-object: ^5.0.0
-    slate: ^0.82.0
     source-map-loader: ^4.0.0
   peerDependencies:
-    slate: ">=0.65.3"
+    "@journalytic/slate": ">=0.65.3"
   languageName: unknown
   linkType: soft
 
@@ -2366,6 +2366,8 @@ __metadata:
   resolution: "@journalytic/slate-react@workspace:packages/slate-react"
   dependencies:
     "@babel/runtime": ^7.7.4
+    "@journalytic/slate": ^0.82.0
+    "@journalytic/slate-hyperscript": ^0.81.3
     "@types/is-hotkey": ^0.1.1
     "@types/jest": ^27.4.1
     "@types/jsdom": ^16.2.14
@@ -2381,26 +2383,24 @@ __metadata:
     react-dom: ">=16.8.0"
     react-test-renderer: ">=16.8.0"
     scroll-into-view-if-needed: ^2.2.20
-    slate: ^0.82.0
-    slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
     tiny-invariant: 1.0.6
   peerDependencies:
+    "@journalytic/slate": ">=0.65.3"
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
-    slate: ">=0.65.3"
   languageName: unknown
   linkType: soft
 
-"@journalytic/slate@*, @journalytic/slate@workspace:packages/slate":
+"@journalytic/slate@*, @journalytic/slate@^0.82.0, @journalytic/slate@workspace:packages/slate":
   version: 0.0.0-use.local
   resolution: "@journalytic/slate@workspace:packages/slate"
   dependencies:
     "@babel/runtime": ^7.7.4
+    "@journalytic/slate-hyperscript": ^0.81.3
     immer: ^9.0.6
     is-plain-object: ^5.0.0
     lodash: ^4.17.21
-    slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
     tiny-warning: ^1.0.3
   languageName: unknown
@@ -14436,28 +14436,6 @@ resolve@^2.0.0-next.3:
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
   checksum: 94a93fff615f25a999ad4b83c9d5e257a7280c90a32a7cb8b4a87996e4babf322e469c42b7f649fd5796edd8687652f3fb452a86dc97a816f01113183393f11c
-  languageName: node
-  linkType: hard
-
-"slate-hyperscript@npm:^0.81.3":
-  version: 0.81.3
-  resolution: "slate-hyperscript@npm:0.81.3"
-  dependencies:
-    is-plain-object: ^5.0.0
-  peerDependencies:
-    slate: ">=0.65.3"
-  checksum: cc3ba04d14e20c66eee5e5b0ca2d60fe92c0d38caf9b412153453d42f32d90bce61d57e3a00b2a4c30a7b15408bf8b14132871fd3c00f75de6ca4b49387637fe
-  languageName: node
-  linkType: hard
-
-"slate@npm:^0.82.0":
-  version: 0.82.1
-  resolution: "slate@npm:0.82.1"
-  dependencies:
-    immer: ^9.0.6
-    is-plain-object: ^5.0.0
-    tiny-warning: ^1.0.3
-  checksum: 391e6be7c1e7865e6f3113b60ed98dcd5261cd80c053e670ecece0b969098d5bacfa3d875c3b38c3d79fc5d5b369e13f351292c968b3661d4957a36a1fd6e06f
   languageName: node
   linkType: hard
 

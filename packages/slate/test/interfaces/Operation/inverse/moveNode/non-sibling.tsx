@@ -1,4 +1,4 @@
-import { Operation } from 'slate'
+import { Operation } from '@journalytic/slate'
 
 export const input = { type: 'move_node', path: [0, 2], newPath: [1, 0, 0] }
 export const test = value => {

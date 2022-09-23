@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Transforms, Text } from 'slate'
+import { Transforms, Text } from '@journalytic/slate'
 import { jsx } from '../../..'
 
 export const run = editor => {

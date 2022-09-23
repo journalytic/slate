@@ -1,4 +1,4 @@
-import { Element } from 'slate'
+import { Element } from '@journalytic/slate'
 import { isHeadingElement } from './type-guards'
 
 export const input: Element = {

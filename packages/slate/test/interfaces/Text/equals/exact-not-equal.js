@@ -1,4 +1,4 @@
-import { Text } from 'slate'
+import { Text } from '@journalytic/slate'
 
 export const input = {
   textNodeA: { text: 'same text', bold: true },

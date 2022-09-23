@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Transforms } from 'slate'
+import { Transforms } from '@journalytic/slate'
 import { jsx } from '../../..'
 
 const fragment = (
