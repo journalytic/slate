@@ -1,9 +1,12 @@
 {
-  "private": true,
-  "name": "slate-packages",
+  "name": "@journalytic/slate-packages",
   "workspaces": [
     "packages/*"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/journalytic/slate"
+  },
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build && next export",
