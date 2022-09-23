@@ -59,7 +59,7 @@ function configure(pkg, env, target) {
     // Allow Rollup to resolve CommonJS modules, since it only resolves ES2015
     // modules by default.
     commonjs({
-      exclude: [`packages/${pkg.name}/src/**`],
+      exclude: [`packages/${pkg.name.replace(/@journalytic\//, '')}/src/**`],
       // HACK: Sometimes the CommonJS plugin can't identify named exports, so
       // we have to manually specify named exports here for them to work.
       // https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
@@ -138,7 +138,10 @@ function configure(pkg, env, target) {
           isProd ? pkg.umdMin : pkg.umd
         }`,
         exports: 'named',
-        name: startCase(pkg.name).replace(/ /g, ''),
+        name: startCase(pkg.name.replace(/@journalytic\//, '')).replace(
+          / /g,
+          ''
+        ),
         globals: pkg.umdGlobals,
       },
       external: Object.keys(pkg.umdGlobals || {}),
