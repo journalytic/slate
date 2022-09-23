@@ -1,4 +1,4 @@
-import { Operation } from 'slate'
+import { Operation } from '@journalytic/slate'
 
 export const input = true
 export const test = value => {

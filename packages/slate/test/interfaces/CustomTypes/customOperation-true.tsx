@@ -1,4 +1,4 @@
-import { Operation } from 'slate'
+import { Operation } from '@journalytic/slate'
 import { isCustomOperation } from './type-guards'
 
 export const input: Operation = {

@@ -1,4 +1,4 @@
-import { Element, Text, Operation } from 'slate'
+import { Element, Text, Operation } from '@journalytic/slate'
 import { CustomText, CustomOperation, HeadingElement } from './custom-types'
 
 export const isBoldText = (text: Text): text is CustomText =>

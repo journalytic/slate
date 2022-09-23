@@ -1,4 +1,4 @@
-import { Node } from 'slate'
+import { Node } from '@journalytic/slate'
 
 export const input = [
   {

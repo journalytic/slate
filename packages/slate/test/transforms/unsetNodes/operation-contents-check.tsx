@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import assert from 'assert'
-import { Transforms, Text, Editor } from 'slate'
+import { Transforms, Text, Editor } from '@journalytic/slate'
 import { jsx } from '../..'
 
 export const run = (editor: Editor) => {

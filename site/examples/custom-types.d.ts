@@ -6,9 +6,9 @@ import {
   Editor,
   Descendant,
   BaseEditor,
-} from 'slate'
-import { ReactEditor } from 'slate-react'
-import { HistoryEditor } from 'slate-history'
+} from '@journalytic/slate'
+import { ReactEditor } from '@journalytic/slate-react'
+import { HistoryEditor } from '@journalytic/slate-history'
 
 export type BlockQuoteElement = {
   type: 'block-quote'
@@ -111,7 +111,7 @@ export type EmptyText = {
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor
 
-declare module 'slate' {
+declare module '@journalytic/slate' {
   interface CustomTypes {
     Editor: CustomEditor
     Element: CustomElement

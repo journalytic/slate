@@ -1,5 +1,11 @@
 import React, { useMemo, useRef, useEffect } from 'react'
-import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
+import {
+  Slate,
+  Editable,
+  withReact,
+  useSlate,
+  useFocused,
+} from '@journalytic/slate-react'
 import {
   Editor,
   Transforms,
@@ -7,9 +13,9 @@ import {
   createEditor,
   Descendant,
   Range,
-} from 'slate'
+} from '@journalytic/slate'
 import { css } from '@emotion/css'
-import { withHistory } from 'slate-history'
+import { withHistory } from '@journalytic/slate-history'
 
 import { Button, Icon, Menu, Portal } from '../components'
 

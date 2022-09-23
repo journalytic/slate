@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
+import { Slate, Editable, withReact } from '@journalytic/slate-react'
 import {
   Editor,
   Transforms,
@@ -8,8 +8,8 @@ import {
   createEditor,
   Element as SlateElement,
   Descendant,
-} from 'slate'
-import { withHistory } from 'slate-history'
+} from '@journalytic/slate'
+import { withHistory } from '@journalytic/slate-history'
 import { BulletedListElement } from './custom-types'
 
 const SHORTCUTS = {

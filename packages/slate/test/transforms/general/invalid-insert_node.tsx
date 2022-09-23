@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import assert from 'assert'
-import { Transforms } from 'slate'
+import { Transforms } from '@journalytic/slate'
 import { jsx } from '../..'
 
 export const input = (

@@ -1,4 +1,12 @@
-import { Editor, Node, Path, Point, Range, Transforms, BaseEditor } from 'slate'
+import {
+  Editor,
+  Node,
+  Path,
+  Point,
+  Range,
+  Transforms,
+  BaseEditor,
+} from '@journalytic/slate'
 
 import { Key } from '../utils/key'
 import {

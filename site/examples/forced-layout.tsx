@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
+import { Slate, Editable, withReact } from '@journalytic/slate-react'
 import {
   Transforms,
   createEditor,
   Node,
   Element as SlateElement,
   Descendant,
-} from 'slate'
-import { withHistory } from 'slate-history'
+} from '@journalytic/slate'
+import { withHistory } from '@journalytic/slate-history'
 import { ParagraphElement, TitleElement } from './custom-types'
 
 const withLayout = editor => {

@@ -25,6 +25,8 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
+    "@journalytic/slate": "^0.78.0",
+    "@journalytic/slate-hyperscript": "^0.77.0",
     "@types/jest": "^27.4.1",
     "@types/jsdom": "^16.2.14",
     "@types/react": "^16.9.13",
@@ -33,14 +35,12 @@
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-test-renderer": ">=16.8.0",
-    "slate": "^0.78.0",
-    "slate-hyperscript": "^0.77.0",
     "source-map-loader": "^0.2.4"
   },
   "peerDependencies": {
+    "@journalytic/slate": ">=0.65.3",
     "react": ">=16.8.0",
-    "react-dom": ">=16.8.0",
-    "slate": ">=0.65.3"
+    "react-dom": ">=16.8.0"
   },
   "umdGlobals": {
     "react": "React",

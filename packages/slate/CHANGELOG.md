@@ -83,7 +83,7 @@
   For example:
 
   ```
-  import type { BaseOperation } from 'slate'
+  import type { BaseOperation } from '@journalytic/slate'
 
   type CustomOperation =
    | BaseOperation

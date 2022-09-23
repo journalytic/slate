@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 import faker from 'faker'
-import { createEditor, Descendant } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
+import { createEditor, Descendant } from '@journalytic/slate'
+import { Slate, Editable, withReact } from '@journalytic/slate-react'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7

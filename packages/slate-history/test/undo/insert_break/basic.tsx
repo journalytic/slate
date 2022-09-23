@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor } from 'slate'
+import { Editor } from '@journalytic/slate'
 import { jsx } from '../..'
 import { cloneDeep } from 'lodash'
 

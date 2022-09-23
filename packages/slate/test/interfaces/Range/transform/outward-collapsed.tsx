@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import { Range } from '@journalytic/slate'
 
 /**
  * If a collapsed Range is transformed with affinity outward by an insert_text operation, it should expand.

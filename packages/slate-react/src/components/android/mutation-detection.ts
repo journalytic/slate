@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Range } from 'slate'
+import { Editor, Node, Path, Range } from '@journalytic/slate'
 
 import { DOMNode } from '../../utils/dom'
 import { ReactEditor } from '../..'

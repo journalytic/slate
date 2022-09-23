@@ -1,5 +1,5 @@
 import { ReactEditor } from '../../plugin/react-editor'
-import { Editor, Range, Transforms, Text } from 'slate'
+import { Editor, Range, Transforms, Text } from '@journalytic/slate'
 import {
   IS_COMPOSING,
   IS_ON_COMPOSITION_END,

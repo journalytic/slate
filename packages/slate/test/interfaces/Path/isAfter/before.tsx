@@ -1,4 +1,4 @@
-import { Path } from 'slate'
+import { Path } from '@journalytic/slate'
 
 export const input = {
   path: [0, 1, 2],

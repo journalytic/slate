@@ -1,4 +1,4 @@
-import { Operation } from 'slate'
+import { Operation } from '@journalytic/slate'
 // This test covers moving a child to the location of where the current parent is (not becoming its parent).
 // When the move happens the child is inserted infront of its old parent causing its former parent's index to shiftp
 // back within its former grandparent (now parent).

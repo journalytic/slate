@@ -18,11 +18,11 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
-    "slate": "^0.78.0",
+    "@journalytic/slate": "^0.78.0",
     "source-map-loader": "^0.2.4"
   },
   "peerDependencies": {
-    "slate": ">=0.65.3"
+    "@journalytic/slate": ">=0.65.3"
   },
   "umdGlobals": {
     "slate": "Slate"

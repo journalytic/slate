@@ -1,6 +1,11 @@
 import React, { Fragment, useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, Element as SlateElement } from 'slate'
+import {
+  Editor,
+  Node,
+  Range,
+  Element as SlateElement,
+} from '@journalytic/slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'

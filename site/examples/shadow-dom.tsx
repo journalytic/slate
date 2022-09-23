@@ -1,8 +1,8 @@
 import ReactDOM from 'react-dom'
 import React, { useMemo, useRef, useEffect } from 'react'
-import { createEditor, Descendant } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
-import { withHistory } from 'slate-history'
+import { createEditor, Descendant } from '@journalytic/slate'
+import { Slate, Editable, withReact } from '@journalytic/slate-react'
+import { withHistory } from '@journalytic/slate-history'
 
 const ShadowDOM = () => {
   const container = useRef<HTMLDivElement>(null)

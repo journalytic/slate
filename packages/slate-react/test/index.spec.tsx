@@ -6,7 +6,7 @@ import {
   Range,
   Element,
   Transforms,
-} from 'slate'
+} from '@journalytic/slate'
 import { create, act, ReactTestRenderer } from 'react-test-renderer'
 import {
   Slate,

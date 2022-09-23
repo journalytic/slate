@@ -1,4 +1,4 @@
-import { Path } from 'slate'
+import { Path } from '@journalytic/slate'
 
 const path = [3, 3]
 

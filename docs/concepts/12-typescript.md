@@ -17,9 +17,9 @@ To define a custom `Element` or `Text` type, extend the `CustomTypes` interface 
 
 ```typescript
 // This example is for an Editor with `ReactEditor` and `HistoryEditor`
-import { BaseEditor } from 'slate'
-import { ReactEditor } from 'slate-react'
-import { HistoryEditor } from 'slate-history'
+import { BaseEditor } from '@journalytic/slate'
+import { ReactEditor } from '@journalytic/slate-react'
+import { HistoryEditor } from '@journalytic/slate-history'
 
 type CustomElement = { type: 'paragraph'; children: CustomText[] }
 type CustomText = { text: string; bold?: true }
@@ -39,8 +39,8 @@ Annotate the editor's initial value w/ `Descendant[]`.
 
 ```tsx
 import React, { useMemo, useState } from 'react'
-import { createEditor, Descendant } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
+import { createEditor, Descendant } from '@journalytic/slate'
+import { Slate, Editable, withReact } from '@journalytic/slate-react'
 
 const initialValue: Descendant[] = [
   {
@@ -68,9 +68,9 @@ Using best practices, the custom types might look something like:
 
 ```typescript
 // This example is for an Editor with `ReactEditor` and `HistoryEditor`
-import { BaseEditor } from 'slate'
-import { ReactEditor } from 'slate-react'
-import { HistoryEditor } from 'slate-history'
+import { BaseEditor } from '@journalytic/slate'
+import { ReactEditor } from '@journalytic/slate-react'
+import { HistoryEditor } from '@journalytic/slate-history'
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor
 

@@ -6,7 +6,7 @@ import {
   useReducer,
   useRef,
 } from 'react'
-import { Editor } from 'slate'
+import { Editor } from '@journalytic/slate'
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 function isError(error: any): error is Error {

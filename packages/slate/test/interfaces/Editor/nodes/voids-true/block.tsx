@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor, Text } from 'slate'
+import { Editor, Text } from '@journalytic/slate'
 import { jsx } from '../../../..'
 
 export const input = (
