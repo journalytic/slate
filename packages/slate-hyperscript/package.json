@@ -1,5 +1,5 @@
 {
-  "name": "slate-hyperscript",
+  "name": "@journalytic/slate-hyperscript",
   "description": "A hyperscript helper for creating Slate documents.",
   "version": "0.81.3",
   "license": "MIT",

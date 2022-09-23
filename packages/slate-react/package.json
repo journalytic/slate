@@ -1,5 +1,5 @@
 {
-  "name": "slate-react",
+  "name": "@journalytic/slate-react",
   "description": "Tools for building completely customizable richtext editors with React.",
   "version": "0.82.0",
   "license": "MIT",
