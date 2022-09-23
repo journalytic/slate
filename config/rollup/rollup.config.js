@@ -23,7 +23,10 @@ function configure(pkg, env, target) {
   const isUmd = target === 'umd'
   const isModule = target === 'module'
   const isCommonJs = target === 'cjs'
-  const input = `packages/${pkg.name}/src/index.ts`
+  const input = `packages/${pkg.name.replace(
+    /@journalytic\//,
+    ''
+  )}/src/index.ts`
   const deps = []
     .concat(pkg.dependencies ? Object.keys(pkg.dependencies) : [])
     .concat(pkg.peerDependencies ? Object.keys(pkg.peerDependencies) : [])
@@ -44,7 +47,10 @@ function configure(pkg, env, target) {
 
     typescript({
       abortOnError: false,
-      tsconfig: `./packages/${pkg.name}/tsconfig.json`,
+      tsconfig: `./packages/${pkg.name.replace(
+        /@journalytic\//,
+        ''
+      )}/tsconfig.json`,
       // COMPAT: Without this flag sometimes the declarations are not updated.
       // clean: isProd ? true : false,
       clean: true,
@@ -78,7 +84,7 @@ function configure(pkg, env, target) {
     // Use Babel to transpile the result, limiting it to the source code.
     babel({
       runtimeHelpers: true,
-      include: [`packages/${pkg.name}/src/**`],
+      include: [`packages/${pkg.name.replace(/@journalytic\//, '')}/src/**`],
       extensions: ['.js', '.ts', '.tsx'],
       presets: [
         '@babel/preset-typescript',
@@ -128,7 +134,9 @@ function configure(pkg, env, target) {
       onwarn,
       output: {
         format: 'umd',
-        file: `packages/${pkg.name}/${isProd ? pkg.umdMin : pkg.umd}`,
+        file: `packages/${pkg.name.replace(/@journalytic\//, '')}/${
+          isProd ? pkg.umdMin : pkg.umd
+        }`,
         exports: 'named',
         name: startCase(pkg.name).replace(/ /g, ''),
         globals: pkg.umdGlobals,
@@ -144,7 +152,9 @@ function configure(pkg, env, target) {
       onwarn,
       output: [
         {
-          file: `packages/${pkg.name}/${pkg.main}`,
+          file: `packages/${pkg.name.replace(/@journalytic\//, '')}/${
+            pkg.main
+          }`,
           format: 'cjs',
           exports: 'named',
           sourcemap: true,
@@ -166,7 +176,9 @@ function configure(pkg, env, target) {
       onwarn,
       output: [
         {
-          file: `packages/${pkg.name}/${pkg.module}`,
+          file: `packages/${pkg.name.replace(/@journalytic\//, '')}/${
+            pkg.module
+          }`,
           format: 'es',
           sourcemap: true,
         },

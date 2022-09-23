@@ -2253,7 +2253,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@journalytic/slate-history@workspace:packages/slate-history":
+"@journalytic/slate-history@*, @journalytic/slate-history@workspace:packages/slate-history":
   version: 0.0.0-use.local
   resolution: "@journalytic/slate-history@workspace:packages/slate-history"
   dependencies:
@@ -2268,7 +2268,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@journalytic/slate-hyperscript@workspace:packages/slate-hyperscript":
+"@journalytic/slate-hyperscript@*, @journalytic/slate-hyperscript@workspace:packages/slate-hyperscript":
   version: 0.0.0-use.local
   resolution: "@journalytic/slate-hyperscript@workspace:packages/slate-hyperscript"
   dependencies:
@@ -2301,6 +2301,10 @@ __metadata:
     "@changesets/changelog-github": ^0.3.0
     "@changesets/cli": ^2.14.1
     "@emotion/css": ^11.7.1
+    "@journalytic/slate": "*"
+    "@journalytic/slate-history": "*"
+    "@journalytic/slate-hyperscript": "*"
+    "@journalytic/slate-react": "*"
     "@testing-library/cypress": ^8.0.0
     "@types/jest": 27.0.1
     "@types/lodash": ^4.14.149
@@ -2351,17 +2355,13 @@ __metadata:
     rollup-plugin-typescript2: ^0.27.2
     shell-quote: ^1.7.2
     simple-git-hooks: ">=2.0.3"
-    slate: "*"
-    slate-history: "*"
-    slate-hyperscript: "*"
-    slate-react: "*"
     source-map-loader: ^4.0.0
     ts-jest: ^27.1.3
     typescript: 4.0.5
   languageName: unknown
   linkType: soft
 
-"@journalytic/slate-react@workspace:packages/slate-react":
+"@journalytic/slate-react@*, @journalytic/slate-react@workspace:packages/slate-react":
   version: 0.0.0-use.local
   resolution: "@journalytic/slate-react@workspace:packages/slate-react"
   dependencies:
@@ -2392,7 +2392,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@journalytic/slate@workspace:packages/slate":
+"@journalytic/slate@*, @journalytic/slate@workspace:packages/slate":
   version: 0.0.0-use.local
   resolution: "@journalytic/slate@workspace:packages/slate"
   dependencies:
@@ -14439,18 +14439,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"slate-history@npm:*":
-  version: 0.81.3
-  resolution: "slate-history@npm:0.81.3"
-  dependencies:
-    is-plain-object: ^5.0.0
-  peerDependencies:
-    slate: ">=0.65.3"
-  checksum: e19782bdab0cd2d7f6297279238a8a751da4285da81eab8e55906e2e2458e04229908a5f96abe28bf8af44f7c0fe91cc06ff8f809d3fc5f77ab7835c88c92883
-  languageName: node
-  linkType: hard
-
-"slate-hyperscript@npm:*, slate-hyperscript@npm:^0.81.3":
+"slate-hyperscript@npm:^0.81.3":
   version: 0.81.3
   resolution: "slate-hyperscript@npm:0.81.3"
   dependencies:
@@ -14461,27 +14450,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"slate-react@npm:*":
-  version: 0.83.0
-  resolution: "slate-react@npm:0.83.0"
-  dependencies:
-    "@types/is-hotkey": ^0.1.1
-    "@types/lodash": ^4.14.149
-    direction: ^1.0.3
-    is-hotkey: ^0.1.6
-    is-plain-object: ^5.0.0
-    lodash: ^4.17.4
-    scroll-into-view-if-needed: ^2.2.20
-    tiny-invariant: 1.0.6
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-    slate: ">=0.65.3"
-  checksum: 1a648c276ad934a516ba769168a2d8231a7a6fa1c4536a41146284d7952784e087b72fd3bbc44567983986aee663c5414b02b0e73e8442e254cc75c18e031b79
-  languageName: node
-  linkType: hard
-
-"slate@npm:*, slate@npm:^0.82.0":
+"slate@npm:^0.82.0":
   version: 0.82.1
   resolution: "slate@npm:0.82.1"
   dependencies:
