@@ -2247,6 +2247,86 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@journalytic/slate-packages@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@journalytic/slate-packages@workspace:."
+  dependencies:
+    "@babel/cli": ^7.7.4
+    "@babel/core": ^7.7.4
+    "@babel/helper-call-delegate": ^7.7.4
+    "@babel/plugin-external-helpers": ^7.7.4
+    "@babel/plugin-proposal-class-properties": ^7.7.4
+    "@babel/plugin-transform-modules-commonjs": ^7.7.4
+    "@babel/plugin-transform-runtime": ^7.7.4
+    "@babel/polyfill": ^7.6.0
+    "@babel/preset-env": ^7.7.4
+    "@babel/preset-react": ^7.7.4
+    "@babel/preset-typescript": ^7.7.4
+    "@babel/register": ^7.7.4
+    "@babel/runtime": ^7.7.4
+    "@changesets/changelog-github": ^0.3.0
+    "@changesets/cli": ^2.14.1
+    "@emotion/css": ^11.7.1
+    "@testing-library/cypress": ^8.0.0
+    "@types/jest": 27.0.1
+    "@types/lodash": ^4.14.149
+    "@types/mocha": ^5.2.7
+    "@types/node": ^16.11.26
+    "@types/react": ^16.9.13
+    "@types/react-dom": ^16.9.4
+    "@typescript-eslint/eslint-plugin": ^5.30.5
+    "@typescript-eslint/parser": ^5.30.5
+    babel-eslint: ^10.0.3
+    babel-jest: 27.0.6
+    babel-plugin-dev-expression: ^0.2.2
+    babel-plugin-module-resolver: ^3.1.1
+    cypress: ^8.3.0
+    eslint: ^7.32.0
+    eslint-config-prettier: ^7.2.0
+    eslint-plugin-import: ^2.18.2
+    eslint-plugin-prettier: ^3.1.1
+    eslint-plugin-react: ^7.16.0
+    faker: ^4.1.0
+    image-extensions: ^1.1.0
+    is-hotkey: ^0.1.6
+    is-url: ^1.2.2
+    jest: 27.0.6
+    lerna: ^3.19.0
+    lint-staged: ">=10"
+    lodash: ^4.17.4
+    mocha: ^6.2.0
+    next: ^12.2.0
+    npm-run-all: ^4.1.2
+    prettier: ^1.19.1
+    prismjs: ^1.5.1
+    react: ^16.12.0
+    react-dom: ^16.12.0
+    react-error-boundary: ^1.2.5
+    react-router-dom: ^5.1.2
+    react-values: ^0.3.0
+    rimraf: ^3.0.2
+    rollup: ^2.26.6
+    rollup-plugin-babel: ^4.3.3
+    rollup-plugin-commonjs: ^10.1.0
+    rollup-plugin-json: ^4.0.0
+    rollup-plugin-node-builtins: ^2.1.2
+    rollup-plugin-node-globals: ^1.4.0
+    rollup-plugin-node-resolve: ^5.2.0
+    rollup-plugin-replace: ^2.2.0
+    rollup-plugin-terser: ^7.0.0
+    rollup-plugin-typescript2: ^0.27.2
+    shell-quote: ^1.7.2
+    simple-git-hooks: ">=2.0.3"
+    slate: "workspace:*"
+    slate-history: "workspace:*"
+    slate-hyperscript: "workspace:*"
+    slate-react: "workspace:*"
+    source-map-loader: ^4.0.0
+    ts-jest: ^27.1.3
+    typescript: 4.0.5
+  languageName: unknown
+  linkType: soft
+
 "@lerna/add@npm:3.21.0":
   version: 3.21.0
   resolution: "@lerna/add@npm:3.21.0"
@@ -14521,86 +14601,6 @@ resolve@^2.0.0-next.3:
     source-map-loader: ^0.2.4
   peerDependencies:
     slate: ">=0.65.3"
-  languageName: unknown
-  linkType: soft
-
-"slate-packages@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "slate-packages@workspace:."
-  dependencies:
-    "@babel/cli": ^7.7.4
-    "@babel/core": ^7.7.4
-    "@babel/helper-call-delegate": ^7.7.4
-    "@babel/plugin-external-helpers": ^7.7.4
-    "@babel/plugin-proposal-class-properties": ^7.7.4
-    "@babel/plugin-transform-modules-commonjs": ^7.7.4
-    "@babel/plugin-transform-runtime": ^7.7.4
-    "@babel/polyfill": ^7.6.0
-    "@babel/preset-env": ^7.7.4
-    "@babel/preset-react": ^7.7.4
-    "@babel/preset-typescript": ^7.7.4
-    "@babel/register": ^7.7.4
-    "@babel/runtime": ^7.7.4
-    "@changesets/changelog-github": ^0.3.0
-    "@changesets/cli": ^2.14.1
-    "@emotion/css": ^11.7.1
-    "@testing-library/cypress": ^8.0.0
-    "@types/jest": 27.0.1
-    "@types/lodash": ^4.14.149
-    "@types/mocha": ^5.2.7
-    "@types/node": ^16.11.26
-    "@types/react": ^16.9.13
-    "@types/react-dom": ^16.9.4
-    "@typescript-eslint/eslint-plugin": ^2.9.0
-    "@typescript-eslint/parser": ^2.9.0
-    babel-eslint: ^10.0.3
-    babel-jest: 27.0.6
-    babel-plugin-dev-expression: ^0.2.2
-    babel-plugin-module-resolver: ^3.1.1
-    cypress: ^8.3.0
-    eslint: ^6.7.1
-    eslint-config-prettier: ^6.7.0
-    eslint-plugin-import: ^2.18.2
-    eslint-plugin-prettier: ^3.1.1
-    eslint-plugin-react: ^7.16.0
-    faker: ^4.1.0
-    image-extensions: ^1.1.0
-    is-hotkey: ^0.1.6
-    is-url: ^1.2.2
-    jest: 27.0.6
-    lerna: ^3.19.0
-    lint-staged: ">=10"
-    lodash: ^4.17.4
-    mocha: ^6.2.0
-    next: ^10.2.3
-    npm-run-all: ^4.1.2
-    prettier: ^1.19.1
-    prismjs: ^1.5.1
-    react: ^16.12.0
-    react-dom: ^16.12.0
-    react-error-boundary: ^1.2.5
-    react-router-dom: ^5.1.2
-    react-values: ^0.3.0
-    rimraf: ^3.0.2
-    rollup: ^2.26.6
-    rollup-plugin-babel: ^4.3.3
-    rollup-plugin-commonjs: ^10.1.0
-    rollup-plugin-json: ^4.0.0
-    rollup-plugin-node-builtins: ^2.1.2
-    rollup-plugin-node-globals: ^1.4.0
-    rollup-plugin-node-resolve: ^5.2.0
-    rollup-plugin-replace: ^2.2.0
-    rollup-plugin-terser: ^7.0.0
-    rollup-plugin-typescript2: ^0.27.2
-    shell-quote: ^1.7.2
-    simple-git-hooks: ">=2.0.3"
-    slate: "workspace:*"
-    slate-history: "workspace:*"
-    slate-hyperscript: "workspace:*"
-    slate-react: "workspace:*"
-    source-map-loader: ^0.2.4
-    ts-jest: ^27.1.3
-    typescript: 3.9.7
   languageName: unknown
   linkType: soft
 
