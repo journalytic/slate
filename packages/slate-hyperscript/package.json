@@ -1,9 +1,9 @@
 {
-  "name": "slate-hyperscript",
+  "name": "@journalytic/slate-hyperscript",
   "description": "A hyperscript helper for creating Slate documents.",
   "version": "0.77.0",
   "license": "MIT",
-  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -26,6 +26,9 @@
   },
   "umdGlobals": {
     "slate": "Slate"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [
     "deserialize",

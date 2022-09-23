@@ -1,9 +1,9 @@
 {
-  "name": "slate-react",
+  "name": "@journalytic/slate-react",
   "description": "Tools for building completely customizable richtext editors with React.",
   "version": "0.78.1",
   "license": "MIT",
-  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -45,6 +45,9 @@
   "umdGlobals": {
     "react": "React",
     "slate": "Slate"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [
     "canvas",

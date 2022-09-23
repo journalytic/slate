@@ -1,9 +1,9 @@
 {
-  "name": "slate-history",
+  "name": "@journalytic/slate-history",
   "description": "An operation-based history implementation for Slate editors.",
   "version": "0.66.0",
   "license": "MIT",
-  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -28,6 +28,9 @@
   },
   "umdGlobals": {
     "slate": "Slate"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [
     "editor",

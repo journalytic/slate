@@ -1,9 +1,9 @@
 {
-  "name": "slate",
+  "name": "@journalytic/slate",
   "description": "A completely customizable framework for building rich text editors.",
   "version": "0.78.0",
   "license": "MIT",
-  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -23,6 +23,9 @@
     "lodash": "^4.17.21",
     "slate-hyperscript": "^0.77.0",
     "source-map-loader": "^0.2.4"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [
     "canvas",
