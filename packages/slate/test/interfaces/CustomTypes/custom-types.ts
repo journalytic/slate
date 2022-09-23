@@ -35,7 +35,7 @@ export type ExtendedOperation = Operation | CustomOperation
 
 export type CustomElement = HeadingElement | ListItemElement
 
-declare module 'slate' {
+declare module '@journalytic/slate' {
   interface CustomTypes {
     Editor: BaseEditor
     Element: CustomElement

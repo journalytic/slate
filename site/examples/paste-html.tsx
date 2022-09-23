@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { jsx } from 'slate-hyperscript'
+import { jsx } from '@journalytic/slate-hyperscript'
 import { Transforms, createEditor, Descendant } from '@journalytic/slate'
 import { withHistory } from '@journalytic/slate-history'
 import { css } from '@emotion/css'

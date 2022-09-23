@@ -57,7 +57,7 @@ import { ReactEditor } from '@journalytic/slate-react'
 type CustomElement = { type: 'paragraph'; children: CustomText[] }
 type CustomText = { text: string }
 
-declare module 'slate' {
+declare module '@journalytic/slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor
     Element: CustomElement

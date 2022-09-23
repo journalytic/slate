@@ -1,6 +1,6 @@
 /** @jsx jsx  */
 import { Editor } from '@journalytic/slate'
-import { jsx } from 'slate-hyperscript'
+import { jsx } from '@journalytic/slate-hyperscript'
 
 export const input = (
   <editor>

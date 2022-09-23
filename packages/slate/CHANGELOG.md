@@ -134,7 +134,7 @@
    | YourCustomOperation
    | AnotherCustomOperation
 
-  declare module 'slate' {
+  declare module '@journalytic/slate' {
     interface CustomTypes {
       Operation: CustomOperation;
     }

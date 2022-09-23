@@ -24,7 +24,7 @@ import { HistoryEditor } from '@journalytic/slate-history'
 type CustomElement = { type: 'paragraph'; children: CustomText[] }
 type CustomText = { text: string; bold?: true }
 
-declare module 'slate' {
+declare module '@journalytic/slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor & HistoryEditor
     Element: CustomElement
@@ -91,7 +91,7 @@ export type FormattedText = { text: string; bold?: true }
 
 export type CustomText = FormattedText
 
-declare module 'slate' {
+declare module '@journalytic/slate' {
   interface CustomTypes {
     Editor: CustomEditor
     Element: CustomElement
