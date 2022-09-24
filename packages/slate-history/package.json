@@ -1,7 +1,7 @@
 {
   "name": "@journalytic/slate-history",
   "description": "An operation-based history implementation for Slate editors.",
-  "version": "0.78.2",
+  "version": "0.78.3",
   "license": "MIT",
   "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
-    "@journalytic/slate": "^0.78.2",
-    "@journalytic/slate-hyperscript": "^0.78.2",
+    "@journalytic/slate": "^0.78.3",
+    "@journalytic/slate-hyperscript": "^0.78.3",
     "lodash": "^4.17.21",
     "source-map-loader": "^0.2.4"
   },
