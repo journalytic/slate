@@ -1,7 +1,7 @@
 {
   "name": "@journalytic/slate-hyperscript",
   "description": "A hyperscript helper for creating Slate documents.",
-  "version": "0.78.3",
+  "version": "0.78.4",
   "license": "MIT",
   "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
@@ -18,11 +18,11 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
-    "@journalytic/slate": "^0.78.3",
+    "@journalytic/slate": "^0.78.4",
     "source-map-loader": "^0.2.4"
   },
   "peerDependencies": {
-    "@journalytic/slate": ">=0.65.3"
+    "@journalytic/slate": ">=0.78.4"
   },
   "umdGlobals": {
     "slate": "Slate"
