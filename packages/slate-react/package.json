@@ -1,7 +1,7 @@
 {
   "name": "@journalytic/slate-react",
   "description": "Tools for building completely customizable richtext editors with React.",
-  "version": "0.78.4",
+  "version": "0.78.5",
   "license": "MIT",
   "repository": "git://github.com/journalytic/slate.git",
   "main": "dist/index.js",
@@ -25,8 +25,8 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
-    "@journalytic/slate": "^0.78.4",
-    "@journalytic/slate-hyperscript": "^0.78.4",
+    "@journalytic/slate": "^0.78.5",
+    "@journalytic/slate-hyperscript": "^0.78.5",
     "@types/jest": "^27.4.1",
     "@types/jsdom": "^16.2.14",
     "@types/react": "^16.9.13",
