@@ -215,10 +215,21 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
+    // If the focus is not in Editable and the user does undo,
+    // the browser performs the undo and this code executes with editor state out of
+    // sync with DOM state (children and selection), which causes a crash in toDOMRange.
+    // The onDOMSelectionChange callback occurs before this point, but since it is
+    // throttled it opens a window for the selection to not be updated beforehand.
+    let newDomRange: DOMRange | null;
+    try {
+      newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+    } catch {
+      return
+    }
+
     // Otherwise the DOM selection is out of sync, so update it.
     state.isUpdatingSelection = true
 
-    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
     if (newDomRange) {
       if (Range.isBackward(selection!)) {
         domSelection.setBaseAndExtent(
