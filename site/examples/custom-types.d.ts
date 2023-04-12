@@ -1,11 +1,9 @@
 import {
-  Text,
-  createEditor,
-  Node,
-  Element,
-  Editor,
   Descendant,
   BaseEditor,
+  BaseRange,
+  Range,
+  Element,
 } from '@journalytic/slate'
 import { ReactEditor } from '@journalytic/slate-react'
 import { HistoryEditor } from '@journalytic/slate-history'
@@ -55,6 +53,8 @@ export type LinkElement = { type: 'link'; url: string; children: Descendant[] }
 
 export type ButtonElement = { type: 'button'; children: Descendant[] }
 
+export type BadgeElement = { type: 'badge'; children: Descendant[] }
+
 export type ListItemElement = { type: 'list-item'; children: Descendant[] }
 
 export type MentionElement = {
@@ -79,6 +79,17 @@ export type TitleElement = { type: 'title'; children: Descendant[] }
 
 export type VideoElement = { type: 'video'; url: string; children: EmptyText[] }
 
+export type CodeBlockElement = {
+  type: 'code-block'
+  language: string
+  children: Descendant[]
+}
+
+export type CodeLineElement = {
+  type: 'code-line'
+  children: Descendant[]
+}
+
 type CustomElement =
   | BlockQuoteElement
   | BulletedListElement
@@ -89,6 +100,7 @@ type CustomElement =
   | ImageElement
   | LinkElement
   | ButtonElement
+  | BadgeElement
   | ListItemElement
   | MentionElement
   | ParagraphElement
@@ -97,6 +109,8 @@ type CustomElement =
   | TableCellElement
   | TitleElement
   | VideoElement
+  | CodeBlockElement
+  | CodeLineElement
 
 export type CustomText = {
   bold?: boolean
@@ -109,12 +123,19 @@ export type EmptyText = {
   text: string
 }
 
-export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor
+export type CustomEditor = BaseEditor &
+  ReactEditor &
+  HistoryEditor & {
+    nodeToDecorations?: Map<Element, Range[]>
+  }
 
 declare module '@journalytic/slate' {
   interface CustomTypes {
     Editor: CustomEditor
     Element: CustomElement
     Text: CustomText | EmptyText
+    Range: BaseRange & {
+      [key: string]: unknown
+    }
   }
 }

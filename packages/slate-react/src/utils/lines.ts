@@ -3,7 +3,7 @@
  */
 
 import { Range, Editor } from '@journalytic/slate'
-import { ReactEditor } from '..'
+import { ReactEditor } from '../plugin/react-editor'
 
 const doRectsIntersect = (rect: DOMRect, compareRect: DOMRect) => {
   const middle = (compareRect.top + compareRect.bottom) / 2

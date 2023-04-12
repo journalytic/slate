@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor } from '@journalytic/slate'
+import { Editor, Element } from '@journalytic/slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -11,7 +11,7 @@ export const input = (
 export const test = editor => {
   return Editor.next(editor, {
     at: [0],
-    match: n => Editor.isBlock(editor, n),
+    match: n => Element.isElement(n) && Editor.isBlock(editor, n),
   })
 }
 export const output = [<block>two</block>, [1]]

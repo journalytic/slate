@@ -1,4 +1,4 @@
-import React, { Fragment, useRef } from 'react'
+import React, { useCallback } from 'react'
 import getDirection from 'direction'
 import {
   Editor,
@@ -10,7 +10,6 @@ import {
 import Text from './text'
 import useChildren from '../hooks/use-children'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -18,14 +17,12 @@ import {
   NODE_TO_INDEX,
   EDITOR_TO_KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
-import { isDecoratorRangeListEqual } from '../utils/range-list'
+import { isElementDecorationsEqual } from '../utils/range-list'
 import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
 } from './editable'
-import { useContentKey } from '../hooks/use-content-key'
-import { IS_ANDROID } from '../utils/environment'
 
 /**
  * Element.
@@ -47,11 +44,25 @@ const Element = (props: {
     renderLeaf,
     selection,
   } = props
-  const ref = useRef<HTMLElement>(null)
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
+  const ref = useCallback(
+    (ref: HTMLElement | null) => {
+      // Update element-related weak maps with the DOM element ref.
+      const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
+      if (ref) {
+        KEY_TO_ELEMENT?.set(key, ref)
+        NODE_TO_ELEMENT.set(element, ref)
+        ELEMENT_TO_NODE.set(ref, element)
+      } else {
+        KEY_TO_ELEMENT?.delete(key)
+        NODE_TO_ELEMENT.delete(element)
+      }
+    },
+    [editor, key, element]
+  )
   let children: React.ReactNode = useChildren({
     decorations,
     node: element,
@@ -125,27 +136,7 @@ const Element = (props: {
     NODE_TO_PARENT.set(text, element)
   }
 
-  // Update element-related weak maps with the DOM element ref.
-  useIsomorphicLayoutEffect(() => {
-    const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
-    if (ref.current) {
-      KEY_TO_ELEMENT?.set(key, ref.current)
-      NODE_TO_ELEMENT.set(element, ref.current)
-      ELEMENT_TO_NODE.set(ref.current, element)
-    } else {
-      KEY_TO_ELEMENT?.delete(key)
-      NODE_TO_ELEMENT.delete(element)
-    }
-  })
-
-  const content = renderElement({ attributes, children, element })
-
-  if (IS_ANDROID) {
-    const contentKey = useContentKey(element)
-    return <Fragment key={contentKey}>{content}</Fragment>
-  }
-
-  return content
+  return renderElement({ attributes, children, element })
 }
 
 const MemoizedElement = React.memo(Element, (prev, next) => {
@@ -153,7 +144,8 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
-    isDecoratorRangeListEqual(prev.decorations, next.decorations) &&
+    prev.renderPlaceholder === next.renderPlaceholder &&
+    isElementDecorationsEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&

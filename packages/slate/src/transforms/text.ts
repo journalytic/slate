@@ -46,6 +46,7 @@ export interface TextTransforms {
   ) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const TextTransforms: TextTransforms = {
   /**
    * Delete content in the editor.
@@ -65,7 +66,9 @@ export const TextTransforms: TextTransforms = {
         return
       }
 
+      let isCollapsed = false
       if (Range.isRange(at) && Range.isCollapsed(at)) {
+        isCollapsed = true
         at = at.anchor
       }
 
@@ -105,27 +108,29 @@ export const TextTransforms: TextTransforms = {
 
       let [start, end] = Range.edges(at)
       const startBlock = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         at: start,
         voids,
       })
       const endBlock = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         at: end,
         voids,
       })
       const isAcrossBlocks =
         startBlock && endBlock && !Path.equals(startBlock[1], endBlock[1])
       const isSingleText = Path.equals(start.path, end.path)
-      const startVoid = voids
+      const startNonEditable = voids
         ? null
-        : Editor.void(editor, { at: start, mode: 'highest' })
-      const endVoid = voids
+        : Editor.void(editor, { at: start, mode: 'highest' }) ??
+          Editor.elementReadOnly(editor, { at: start, mode: 'highest' })
+      const endNonEditable = voids
         ? null
-        : Editor.void(editor, { at: end, mode: 'highest' })
+        : Editor.void(editor, { at: end, mode: 'highest' }) ??
+          Editor.elementReadOnly(editor, { at: end, mode: 'highest' })
 
       // If the start or end points are inside an inline void, nudge them out.
-      if (startVoid) {
+      if (startNonEditable) {
         const before = Editor.before(editor, start)
 
         if (
@@ -137,7 +142,7 @@ export const TextTransforms: TextTransforms = {
         }
       }
 
-      if (endVoid) {
+      if (endNonEditable) {
         const after = Editor.after(editor, end)
 
         if (after && endBlock && Path.isAncestor(endBlock[1], after.path)) {
@@ -158,7 +163,10 @@ export const TextTransforms: TextTransforms = {
         }
 
         if (
-          (!voids && Editor.isVoid(editor, node)) ||
+          (!voids &&
+            Element.isElement(node) &&
+            (Editor.isVoid(editor, node) ||
+              Editor.isElementReadOnly(editor, node))) ||
           (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))
         ) {
           matches.push(entry)
@@ -170,29 +178,36 @@ export const TextTransforms: TextTransforms = {
       const startRef = Editor.pointRef(editor, start)
       const endRef = Editor.pointRef(editor, end)
 
-      if (!isSingleText && !startVoid) {
+      let removedText = ''
+
+      if (!isSingleText && !startNonEditable) {
         const point = startRef.current!
         const [node] = Editor.leaf(editor, point)
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
-        if (text.length > 0)
+        if (text.length > 0) {
           editor.apply({ type: 'remove_text', path, offset, text })
+          removedText = text
+        }
       }
 
-      for (const pathRef of pathRefs) {
-        const path = pathRef.unref()!
-        Transforms.removeNodes(editor, { at: path, voids })
-      }
+      pathRefs
+        .reverse()
+        .map(r => r.unref())
+        .filter((r): r is Path => r !== null)
+        .forEach(p => Transforms.removeNodes(editor, { at: p, voids }))
 
-      if (!endVoid) {
+      if (!endNonEditable) {
         const point = endRef.current!
         const [node] = Editor.leaf(editor, point)
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
-        if (text.length > 0)
+        if (text.length > 0) {
           editor.apply({ type: 'remove_text', path, offset, text })
+          removedText = text
+        }
       }
 
       if (
@@ -206,6 +221,22 @@ export const TextTransforms: TextTransforms = {
           hanging: true,
           voids,
         })
+      }
+
+      // For Thai script, deleting N character(s) backward should delete
+      // N code point(s) instead of an entire grapheme cluster.
+      // Therefore, the remaining code points should be inserted back.
+      if (
+        isCollapsed &&
+        reverse &&
+        unit === 'character' &&
+        removedText.length > 1 &&
+        removedText.match(/[\u0E00-\u0E7F]+/)
+      ) {
+        Transforms.insertText(
+          editor,
+          removedText.slice(0, removedText.length - distance)
+        )
       }
 
       const startUnref = startRef.unref()
@@ -239,7 +270,7 @@ export const TextTransforms: TextTransforms = {
         return
       } else if (Range.isRange(at)) {
         if (!hanging) {
-          at = Editor.unhangRange(editor, at)
+          at = Editor.unhangRange(editor, at, { voids })
         }
 
         if (Range.isCollapsed(at)) {
@@ -267,7 +298,7 @@ export const TextTransforms: TextTransforms = {
       // instead since it will need to be split otherwise.
       const inlineElementMatch = Editor.above(editor, {
         at,
-        match: n => Editor.isInline(editor, n),
+        match: n => Element.isElement(n) && Editor.isInline(editor, n),
         mode: 'highest',
         voids,
       })
@@ -285,7 +316,7 @@ export const TextTransforms: TextTransforms = {
       }
 
       const blockMatch = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         at,
         voids,
       })!
@@ -372,7 +403,7 @@ export const TextTransforms: TextTransforms = {
 
       const middleRef = Editor.pathRef(
         editor,
-        isBlockEnd ? Path.next(blockPath) : blockPath
+        isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
       )
 
       const endRef = Editor.pathRef(
@@ -380,15 +411,17 @@ export const TextTransforms: TextTransforms = {
         isInlineEnd ? Path.next(inlinePath) : inlinePath
       )
 
-      const blockPathRef = Editor.pathRef(editor, blockPath)
-
       Transforms.splitNodes(editor, {
         at,
         match: n =>
           hasBlocks
-            ? Editor.isBlock(editor, n)
+            ? Element.isElement(n) && Editor.isBlock(editor, n)
             : Text.isText(n) || Editor.isInline(editor, n),
         mode: hasBlocks ? 'lowest' : 'highest',
+        always:
+          hasBlocks &&
+          (!isBlockStart || starts.length > 0) &&
+          (!isBlockEnd || ends.length > 0),
         voids,
       })
 
@@ -406,13 +439,13 @@ export const TextTransforms: TextTransforms = {
         voids,
       })
 
-      if (isBlockEmpty && middles.length) {
-        Transforms.delete(editor, { at: blockPathRef.unref()!, voids })
+      if (isBlockEmpty && !starts.length && middles.length && !ends.length) {
+        Transforms.delete(editor, { at: blockPath, voids })
       }
 
       Transforms.insertNodes(editor, middles, {
         at: middleRef.current!,
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         mode: 'lowest',
         voids,
       })
@@ -427,16 +460,18 @@ export const TextTransforms: TextTransforms = {
       if (!options.at) {
         let path
 
-        if (ends.length > 0) {
-          path = Path.previous(endRef.current!)
-        } else if (middles.length > 0) {
-          path = Path.previous(middleRef.current!)
-        } else {
-          path = Path.previous(startRef.current!)
+        if (ends.length > 0 && endRef.current) {
+          path = Path.previous(endRef.current)
+        } else if (middles.length > 0 && middleRef.current) {
+          path = Path.previous(middleRef.current)
+        } else if (startRef.current) {
+          path = Path.previous(startRef.current)
         }
 
-        const end = Editor.end(editor, path)
-        Transforms.select(editor, end)
+        if (path) {
+          const end = Editor.end(editor, path)
+          Transforms.select(editor, end)
+        }
       }
 
       startRef.unref()
@@ -474,14 +509,22 @@ export const TextTransforms: TextTransforms = {
           if (!voids && Editor.void(editor, { at: end })) {
             return
           }
-          const pointRef = Editor.pointRef(editor, end)
+          const start = Range.start(at)
+          const startRef = Editor.pointRef(editor, start)
+          const endRef = Editor.pointRef(editor, end)
           Transforms.delete(editor, { at, voids })
-          at = pointRef.unref()!
+          const startPoint = startRef.unref()
+          const endPoint = endRef.unref()
+
+          at = startPoint || endPoint!
           Transforms.setSelection(editor, { anchor: at, focus: at })
         }
       }
 
-      if (!voids && Editor.void(editor, { at })) {
+      if (
+        (!voids && Editor.void(editor, { at })) ||
+        Editor.elementReadOnly(editor, { at })
+      ) {
         return
       }
 

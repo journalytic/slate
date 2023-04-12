@@ -1,11 +1,13 @@
 import {
+  BaseEditor,
   Editor,
   Node,
   Path,
   Point,
   Range,
+  Scrubber,
   Transforms,
-  BaseEditor,
+  Element,
 } from '@journalytic/slate'
 
 import { Key } from '../utils/key'
@@ -19,6 +21,9 @@ import {
   NODE_TO_PARENT,
   EDITOR_TO_WINDOW,
   EDITOR_TO_KEY_TO_ELEMENT,
+  IS_COMPOSING,
+  EDITOR_TO_SCHEDULE_FLUSH,
+  EDITOR_TO_PENDING_DIFFS,
 } from '../utils/weak-maps'
 import {
   DOMElement,
@@ -29,10 +34,12 @@ import {
   DOMStaticRange,
   isDOMElement,
   isDOMSelection,
+  isDOMNode,
   normalizeDOMPoint,
   hasShadowRoot,
+  DOMText,
 } from '../utils/dom'
-import { IS_CHROME, IS_FIREFOX } from '../utils/environment'
+import { IS_CHROME, IS_FIREFOX, IS_ANDROID } from '../utils/environment'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
@@ -47,9 +54,34 @@ export interface ReactEditor extends BaseEditor {
     originEvent?: 'drag' | 'copy' | 'cut'
   ) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
+  hasTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => target is DOMNode
+  hasEditableTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => target is DOMNode
+  hasSelectableTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => boolean
+  isTargetInsideNonReadonlyVoid: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => boolean
 }
 
+// eslint-disable-next-line no-redeclare
 export const ReactEditor = {
+  /**
+   * Check if the user is currently composing inside the editor.
+   */
+
+  isComposing(editor: ReactEditor): boolean {
+    return !!IS_COMPOSING.get(editor)
+  },
+
   /**
    * Return the host window of the current editor.
    */
@@ -107,7 +139,7 @@ export const ReactEditor = {
     }
 
     throw new Error(
-      `Unable to find the path for Slate node: ${JSON.stringify(node)}`
+      `Unable to find the path for Slate node: ${Scrubber.stringify(node)}`
     )
   },
 
@@ -178,7 +210,6 @@ export const ReactEditor = {
    */
 
   deselect(editor: ReactEditor): void {
-    const el = ReactEditor.toDOMNode(editor, editor)
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
@@ -284,7 +315,7 @@ export const ReactEditor = {
 
     if (!domNode) {
       throw new Error(
-        `Cannot resolve a DOM node from Slate node: ${JSON.stringify(node)}`
+        `Cannot resolve a DOM node from Slate node: ${Scrubber.stringify(node)}`
       )
     }
 
@@ -313,7 +344,8 @@ export const ReactEditor = {
     const texts = Array.from(el.querySelectorAll(selector))
     let start = 0
 
-    for (const text of texts) {
+    for (let i = 0; i < texts.length; i++) {
+      const text = texts[i]
       const domNode = text.childNodes[0] as HTMLElement
 
       if (domNode == null || domNode.textContent == null) {
@@ -324,6 +356,27 @@ export const ReactEditor = {
       const attr = text.getAttribute('data-slate-length')
       const trueLength = attr == null ? length : parseInt(attr, 10)
       const end = start + trueLength
+
+      // Prefer putting the selection inside the mark placeholder to ensure
+      // composed text is displayed with the correct marks.
+      const nextText = texts[i + 1]
+      if (
+        point.offset === end &&
+        nextText?.hasAttribute('data-slate-mark-placeholder')
+      ) {
+        const domText = nextText.childNodes[0]
+
+        domPoint = [
+          // COMPAT: If we don't explicity set the dom point to be on the actual
+          // dom text element, chrome will put the selection behind the actual dom
+          // text element, causing domRange.getBoundingClientRect() calls on a collapsed
+          // selection to return incorrect zero values (https://bugs.chromium.org/p/chromium/issues/detail?id=435438)
+          // which will cause issues when scrolling to it.
+          domText instanceof DOMText ? domText : nextText,
+          nextText.textContent?.startsWith('\uFEFF') ? 1 : 0,
+        ]
+        break
+      }
 
       if (point.offset <= end) {
         const offset = Math.min(length, Math.max(0, point.offset - start))
@@ -336,7 +389,9 @@ export const ReactEditor = {
 
     if (!domPoint) {
       throw new Error(
-        `Cannot resolve a DOM point from Slate point: ${JSON.stringify(point)}`
+        `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
+          point
+        )}`
       )
     }
 
@@ -423,7 +478,7 @@ export const ReactEditor = {
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
     // coordinates are closest to.
-    if (Editor.isVoid(editor, node)) {
+    if (Element.isElement(node) && Editor.isVoid(editor, node)) {
       const rect = target.getBoundingClientRect()
       const isPrev = editor.isInline(node)
         ? x - rect.left < rect.left + rect.width - x
@@ -479,7 +534,7 @@ export const ReactEditor = {
     editor: ReactEditor,
     domPoint: DOMPoint,
     options: {
-      exactMatch: T
+      exactMatch: boolean
       suppressThrow: T
     }
   ): T extends true ? Point | null : Point {
@@ -527,6 +582,22 @@ export const ReactEditor = {
           ]
 
           removals.forEach(el => {
+            // COMPAT: While composing at the start of a text node, some keyboards put
+            // the text content inside the zero width space.
+            if (
+              IS_ANDROID &&
+              !exactMatch &&
+              el.hasAttribute('data-slate-zero-width') &&
+              el.textContent.length > 0 &&
+              el.textContext !== '\uFEFF'
+            ) {
+              if (el.textContent.startsWith('\uFEFF')) {
+                el.textContent = el.textContent.slice(1)
+              }
+
+              return
+            }
+
             el!.parentNode!.removeChild(el)
           })
 
@@ -567,6 +638,11 @@ export const ReactEditor = {
       if (
         domNode &&
         offset === domNode.textContent!.length &&
+        // COMPAT: Android IMEs might remove the zero width space while composing,
+        // and we don't add it for line-breaks.
+        IS_ANDROID &&
+        domNode.getAttribute('data-slate-zero-width') === 'z' &&
+        domNode.textContent?.startsWith('\uFEFF') &&
         // COMPAT: If the parent node is a Slate zero-width space, editor is
         // because the text node should have no characters. However, during IME
         // composition the ASCII characters will be prepended to the zero-width
@@ -579,6 +655,26 @@ export const ReactEditor = {
           (IS_FIREFOX && domNode.textContent?.endsWith('\n\n')))
       ) {
         offset--
+      }
+    }
+
+    if (IS_ANDROID && !textNode && !exactMatch) {
+      const node = parentNode.hasAttribute('data-slate-node')
+        ? parentNode
+        : parentNode.closest('[data-slate-node]')
+
+      if (node && ReactEditor.hasDOMNode(editor, node, { editable: true })) {
+        const slateNode = ReactEditor.toSlateNode(editor, node)
+        let { path, offset } = Editor.start(
+          editor,
+          ReactEditor.findPath(editor, slateNode)
+        )
+
+        if (!node.querySelector('[data-slate-leaf]')) {
+          offset = nearestOffset
+        }
+
+        return { path, offset } as T extends true ? Point | null : Point
       }
     }
 
@@ -607,7 +703,7 @@ export const ReactEditor = {
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
     options: {
-      exactMatch: T
+      exactMatch: boolean
       suppressThrow: T
     }
   ): T extends true ? Range | null : Range {
@@ -631,7 +727,7 @@ export const ReactEditor = {
         // `isCollapsed` for a Selection that comes from a ShadowRoot.
         // (2020/08/08)
         // https://bugs.chromium.org/p/chromium/issues/detail?id=447523
-        if (IS_CHROME && hasShadowRoot()) {
+        if (IS_CHROME && hasShadowRoot(anchorNode)) {
           isCollapsed =
             domRange.anchorNode === domRange.focusNode &&
             domRange.anchorOffset === domRange.focusOffset
@@ -658,16 +754,26 @@ export const ReactEditor = {
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(
-      editor,
-      [anchorNode, anchorOffset],
-      { exactMatch, suppressThrow }
-    )
+    // COMPAT: Triple-clicking a word in chrome will sometimes place the focus
+    // inside a `contenteditable="false"` DOM node following the word, which
+    // will cause `toSlatePoint` to throw an error. (2023/03/07)
+    if (
+      'getAttribute' in focusNode &&
+      (focusNode as HTMLElement).getAttribute('contenteditable') === 'false'
+    ) {
+      focusNode = anchorNode
+      focusOffset = anchorNode.textContent?.length || 0
+    }
+
+    let anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset], {
+      exactMatch,
+      suppressThrow,
+    })
     if (!anchor) {
       return null as T extends true ? Range | null : Range
     }
 
-    const focus = isCollapsed
+    let focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], {
           exactMatch,
@@ -675,6 +781,46 @@ export const ReactEditor = {
         })
     if (!focus) {
       return null as T extends true ? Range | null : Range
+    }
+
+    /**
+     * suppose we have this document:
+     *
+     * { type: 'paragraph',
+     *   children: [
+     *     { text: 'foo ' },
+     *     { text: 'bar' },
+     *     { text: ' baz' }
+     *   ]
+     * }
+     *
+     * a double click on "bar" on chrome will create this range:
+     *
+     * anchor -> [0,1] offset 0
+     * focus  -> [0,1] offset 3
+     *
+     * while on firefox will create this range:
+     *
+     * anchor -> [0,0] offset 4
+     * focus  -> [0,2] offset 0
+     *
+     * let's try to fix it...
+     */
+
+    if (IS_FIREFOX && !isCollapsed && anchorNode !== focusNode) {
+      const isEnd = Editor.isEnd(editor, anchor!, anchor.path)
+      const isStart = Editor.isStart(editor, focus!, focus.path)
+
+      if (isEnd) {
+        const after = Editor.after(editor, anchor as Point)
+        // Editor.after() might return undefined
+        anchor = (after || anchor!) as T extends true ? Point | null : Point
+      }
+
+      if (isStart) {
+        const before = Editor.before(editor, focus as Point)
+        focus = (before || focus!) as T extends true ? Point | null : Point
+      }
     }
 
     let range: Range = { anchor: anchor as Point, focus: focus as Point }
@@ -699,5 +845,70 @@ export const ReactEditor = {
     return (
       Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
     )
+  },
+
+  /**
+   * Check if the target is in the editor.
+   */
+  hasTarget(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): target is DOMNode {
+    return isDOMNode(target) && ReactEditor.hasDOMNode(editor, target)
+  },
+
+  /**
+   * Check if the target is editable and in the editor.
+   */
+  hasEditableTarget(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): target is DOMNode {
+    return (
+      isDOMNode(target) &&
+      ReactEditor.hasDOMNode(editor, target, { editable: true })
+    )
+  },
+
+  /**
+   * Check if the target can be selectable
+   */
+  hasSelectableTarget(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): boolean {
+    return (
+      ReactEditor.hasEditableTarget(editor, target) ||
+      ReactEditor.isTargetInsideNonReadonlyVoid(editor, target)
+    )
+  },
+
+  /**
+   * Check if the target is inside void and in an non-readonly editor.
+   */
+  isTargetInsideNonReadonlyVoid(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): boolean {
+    if (IS_READ_ONLY.get(editor)) return false
+
+    const slateNode =
+      ReactEditor.hasTarget(editor, target) &&
+      ReactEditor.toSlateNode(editor, target)
+    return Element.isElement(slateNode) && Editor.isVoid(editor, slateNode)
+  },
+
+  /**
+   * Experimental and android specific: Flush all pending diffs and cancel composition at the next possible time.
+   */
+  androidScheduleFlush(editor: Editor) {
+    EDITOR_TO_SCHEDULE_FLUSH.get(editor)?.()
+  },
+
+  /**
+   * Experimental and android specific: Get pending diffs
+   */
+  androidPendingDiffs(editor: Editor) {
+    return EDITOR_TO_PENDING_DIFFS.get(editor)
   },
 }

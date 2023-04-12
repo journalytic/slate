@@ -1,11 +1,11 @@
-import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
-import { Editor, Node, Element, Descendant } from '@journalytic/slate'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { Editor, Node, Descendant, Scrubber } from '@journalytic/slate'
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-slate-static'
-import { SlateContext } from '../hooks/use-slate'
+import { SlateContext, SlateContextValue } from '../hooks/use-slate'
 import {
-  getSelectorContext,
+  useSelectorContext,
   SlateSelectorContext,
 } from '../hooks/use-slate-selector'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
@@ -26,51 +26,55 @@ export const Slate = (props: {
   const { editor, children, onChange, value, ...rest } = props
   const unmountRef = useRef(false)
 
-  const [context, setContext] = React.useState<[ReactEditor]>(() => {
+  const [context, setContext] = React.useState<SlateContextValue>(() => {
     if (!Node.isNodeList(value)) {
       throw new Error(
-        `[Slate] value is invalid! Expected a list of elements` +
-          `but got: ${JSON.stringify(value)}`
+        `[Slate] value is invalid! Expected a list of elements but got: ${Scrubber.stringify(
+          value
+        )}`
       )
     }
     if (!Editor.isEditor(editor)) {
       throw new Error(
-        `[Slate] editor is invalid! you passed:` + `${JSON.stringify(editor)}`
+        `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
     editor.children = value
     Object.assign(editor, rest)
-    return [editor]
+    return { v: 0, editor }
   })
 
   const {
     selectorContext,
     onChange: handleSelectorChange,
-  } = getSelectorContext(editor)
+  } = useSelectorContext(editor)
 
   const onContextChange = useCallback(() => {
     if (onChange) {
       onChange(editor.children)
     }
 
-    setContext([editor])
+    setContext(prevContext => ({
+      v: prevContext.v + 1,
+      editor,
+    }))
     handleSelectorChange(editor)
-  }, [onChange])
-
-  EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+  }, [editor, handleSelectorChange, onChange])
 
   useEffect(() => {
+    EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+
     return () => {
       EDITOR_TO_ON_CHANGE.set(editor, () => {})
       unmountRef.current = true
     }
-  }, [])
+  }, [editor, onContextChange])
 
   const [isFocused, setIsFocused] = useState(ReactEditor.isFocused(editor))
 
   useEffect(() => {
     setIsFocused(ReactEditor.isFocused(editor))
-  })
+  }, [editor])
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => setIsFocused(ReactEditor.isFocused(editor))
@@ -97,7 +101,7 @@ export const Slate = (props: {
   return (
     <SlateSelectorContext.Provider value={selectorContext}>
       <SlateContext.Provider value={context}>
-        <EditorContext.Provider value={editor}>
+        <EditorContext.Provider value={context.editor}>
           <FocusedContext.Provider value={isFocused}>
             {children}
           </FocusedContext.Provider>

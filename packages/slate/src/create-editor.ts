@@ -3,7 +3,6 @@ import {
   Editor,
   Element,
   Node,
-  NodeEntry,
   Operation,
   Path,
   PathRef,
@@ -13,8 +12,8 @@ import {
   Text,
   Transforms,
 } from './'
-import { DIRTY_PATHS, DIRTY_PATH_KEYS, FLUSHING } from './utils/weak-maps'
 import { TextUnit } from './interfaces/types'
+import { DIRTY_PATH_KEYS, DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
 
 /**
  * Create a new Slate `Editor` object.
@@ -26,8 +25,11 @@ export const createEditor = (): Editor => {
     operations: [],
     selection: null,
     marks: null,
+    isElementReadOnly: () => false,
     isInline: () => false,
+    isSelectable: () => true,
     isVoid: () => false,
+    markableVoid: () => false,
     onChange: () => {},
 
     apply: (op: Operation) => {
@@ -71,7 +73,7 @@ export const createEditor = (): Editor => {
         dirtyPathKeys = oldDirtyPathKeys
       }
 
-      const newDirtyPaths = getDirtyPaths(op)
+      const newDirtyPaths = editor.getDirtyPaths(op)
       for (const path of newDirtyPaths) {
         add(path)
       }
@@ -80,7 +82,9 @@ export const createEditor = (): Editor => {
       DIRTY_PATH_KEYS.set(editor, dirtyPathKeys)
       Transforms.transform(editor, op)
       editor.operations.push(op)
-      Editor.normalize(editor)
+      Editor.normalize(editor, {
+        operation: op,
+      })
 
       // Clear any formats applied to the cursor if the selection changes.
       if (op.type === 'set_selection') {
@@ -92,21 +96,42 @@ export const createEditor = (): Editor => {
 
         Promise.resolve().then(() => {
           FLUSHING.set(editor, false)
-          editor.onChange()
+          editor.onChange({ operation: op })
           editor.operations = []
         })
       }
     },
 
     addMark: (key: string, value: any) => {
-      const { selection } = editor
+      const { selection, markableVoid } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        const match = (node: Node, path: Path) => {
+          if (!Text.isText(node)) {
+            return false // marks can only be applied to text
+          }
+          const [parentNode, parentPath] = Editor.parent(editor, path)
+          return !editor.isVoid(parentNode) || editor.markableVoid(parentNode)
+        }
+        const expandedSelection = Range.isExpanded(selection)
+        let markAcceptingVoidSelected = false
+        if (!expandedSelection) {
+          const [selectedNode, selectedPath] = Editor.node(editor, selection)
+          if (selectedNode && match(selectedNode, selectedPath)) {
+            const [parentNode] = Editor.parent(editor, selectedPath)
+            markAcceptingVoidSelected =
+              parentNode && editor.markableVoid(parentNode)
+          }
+        }
+        if (expandedSelection || markAcceptingVoidSelected) {
           Transforms.setNodes(
             editor,
             { [key]: value },
-            { match: Text.isText, split: true }
+            {
+              match,
+              split: true,
+              voids: true,
+            }
           )
         } else {
           const marks = {
@@ -186,7 +211,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    normalizeNode: (entry: NodeEntry) => {
+    normalizeNode: entry => {
       const [node, path] = entry
 
       // There are no core normalizations for text nodes.
@@ -281,10 +306,28 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        const match = (node: Node, path: Path) => {
+          if (!Text.isText(node)) {
+            return false // marks can only be applied to text
+          }
+          const [parentNode, parentPath] = Editor.parent(editor, path)
+          return !editor.isVoid(parentNode) || editor.markableVoid(parentNode)
+        }
+        const expandedSelection = Range.isExpanded(selection)
+        let markAcceptingVoidSelected = false
+        if (!expandedSelection) {
+          const [selectedNode, selectedPath] = Editor.node(editor, selection)
+          if (selectedNode && match(selectedNode, selectedPath)) {
+            const [parentNode] = Editor.parent(editor, selectedPath)
+            markAcceptingVoidSelected =
+              parentNode && editor.markableVoid(parentNode)
+          }
+        }
+        if (expandedSelection || markAcceptingVoidSelected) {
           Transforms.unsetNodes(editor, key, {
-            match: Text.isText,
+            match,
             split: true,
+            voids: true,
           })
         } else {
           const marks = { ...(Editor.marks(editor) || {}) }
@@ -296,83 +339,95 @@ export const createEditor = (): Editor => {
         }
       }
     },
+
+    /**
+     * Get the "dirty" paths generated from an operation.
+     */
+
+    getDirtyPaths: (op: Operation): Path[] => {
+      switch (op.type) {
+        case 'insert_text':
+        case 'remove_text':
+        case 'set_node': {
+          const { path } = op
+          return Path.levels(path)
+        }
+
+        case 'insert_node': {
+          const { node, path } = op
+          const levels = Path.levels(path)
+          const descendants = Text.isText(node)
+            ? []
+            : Array.from(Node.nodes(node), ([, p]) => path.concat(p))
+
+          return [...levels, ...descendants]
+        }
+
+        case 'merge_node': {
+          const { path } = op
+          const ancestors = Path.ancestors(path)
+          const previousPath = Path.previous(path)
+          return [...ancestors, previousPath]
+        }
+
+        case 'move_node': {
+          const { path, newPath } = op
+
+          if (Path.equals(path, newPath)) {
+            return []
+          }
+
+          const oldAncestors: Path[] = []
+          const newAncestors: Path[] = []
+
+          for (const ancestor of Path.ancestors(path)) {
+            const p = Path.transform(ancestor, op)
+            oldAncestors.push(p!)
+          }
+
+          for (const ancestor of Path.ancestors(newPath)) {
+            const p = Path.transform(ancestor, op)
+            newAncestors.push(p!)
+          }
+
+          const newParent = newAncestors[newAncestors.length - 1]
+          const newIndex = newPath[newPath.length - 1]
+          const resultPath = newParent.concat(newIndex)
+
+          return [...oldAncestors, ...newAncestors, resultPath]
+        }
+
+        case 'remove_node': {
+          const { path } = op
+          const ancestors = Path.ancestors(path)
+          return [...ancestors]
+        }
+
+        case 'split_node': {
+          const { path } = op
+          const levels = Path.levels(path)
+          const nextPath = Path.next(path)
+          return [...levels, nextPath]
+        }
+
+        default: {
+          return []
+        }
+      }
+    },
+
+    shouldNormalize: ({ iteration, initialDirtyPathsLength }) => {
+      const maxIterations = initialDirtyPathsLength * 42 // HACK: better way?
+
+      if (iteration > maxIterations) {
+        throw new Error(
+          `Could not completely normalize the editor after ${maxIterations} iterations! This is usually due to incorrect normalization logic that leaves a node in an invalid state.`
+        )
+      }
+
+      return true
+    },
   }
 
   return editor
-}
-
-/**
- * Get the "dirty" paths generated from an operation.
- */
-
-const getDirtyPaths = (op: Operation): Path[] => {
-  switch (op.type) {
-    case 'insert_text':
-    case 'remove_text':
-    case 'set_node': {
-      const { path } = op
-      return Path.levels(path)
-    }
-
-    case 'insert_node': {
-      const { node, path } = op
-      const levels = Path.levels(path)
-      const descendants = Text.isText(node)
-        ? []
-        : Array.from(Node.nodes(node), ([, p]) => path.concat(p))
-
-      return [...levels, ...descendants]
-    }
-
-    case 'merge_node': {
-      const { path } = op
-      const ancestors = Path.ancestors(path)
-      const previousPath = Path.previous(path)
-      return [...ancestors, previousPath]
-    }
-
-    case 'move_node': {
-      const { path, newPath } = op
-
-      if (Path.equals(path, newPath)) {
-        return []
-      }
-
-      const oldAncestors: Path[] = []
-      const newAncestors: Path[] = []
-
-      for (const ancestor of Path.ancestors(path)) {
-        const p = Path.transform(ancestor, op)
-        oldAncestors.push(p!)
-      }
-
-      for (const ancestor of Path.ancestors(newPath)) {
-        const p = Path.transform(ancestor, op)
-        newAncestors.push(p!)
-      }
-
-      const newParent = newAncestors[newAncestors.length - 1]
-      const newIndex = newPath[newPath.length - 1]
-      const resultPath = newParent.concat(newIndex)
-
-      return [...oldAncestors, ...newAncestors, resultPath]
-    }
-
-    case 'remove_node': {
-      const { path } = op
-      const ancestors = Path.ancestors(path)
-      return [...ancestors]
-    }
-
-    case 'split_node': {
-      const { path } = op
-      const levels = Path.levels(path)
-      const nextPath = Path.next(path)
-      return [...levels, nextPath]
-    }
-
-    default: {
-      return []
-    }
-  }
 }

@@ -147,9 +147,10 @@ export interface OperationInterface {
   inverse: (op: Operation) => Operation
 }
 
+// eslint-disable-next-line no-redeclare
 export const Operation: OperationInterface = {
   /**
-   * Check of a value is a `NodeOperation` object.
+   * Check if a value is a `NodeOperation` object.
    */
 
   isNodeOperation(value: any): value is NodeOperation {
@@ -157,7 +158,7 @@ export const Operation: OperationInterface = {
   },
 
   /**
-   * Check of a value is an `Operation` object.
+   * Check if a value is an `Operation` object.
    */
 
   isOperation(value: any): value is Operation {
@@ -225,7 +226,7 @@ export const Operation: OperationInterface = {
   },
 
   /**
-   * Check of a value is a `SelectionOperation` object.
+   * Check if a value is a `SelectionOperation` object.
    */
 
   isSelectionOperation(value: any): value is SelectionOperation {
@@ -233,7 +234,7 @@ export const Operation: OperationInterface = {
   },
 
   /**
-   * Check of a value is a `TextOperation` object.
+   * Check if a value is a `TextOperation` object.
    */
 
   isTextOperation(value: any): value is TextOperation {

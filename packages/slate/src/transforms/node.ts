@@ -1,15 +1,16 @@
 import {
+  Ancestor,
   Editor,
   Element,
   Location,
   Node,
+  NodeEntry,
   Path,
   Point,
   Range,
+  Scrubber,
   Text,
   Transforms,
-  NodeEntry,
-  Ancestor,
 } from '..'
 import { NodeMatch, PropsCompare, PropsMerge } from '../interfaces/editor'
 import { PointRef } from '../interfaces/point-ref'
@@ -99,6 +100,7 @@ export interface NodeTransforms {
       at?: Location
       match?: NodeMatch<T>
       mode?: MaximizeMode
+      hanging?: boolean
       split?: boolean
       voids?: boolean
     }
@@ -126,6 +128,7 @@ export interface NodeTransforms {
   ) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const NodeTransforms: NodeTransforms = {
   /**
    * Insert nodes at a specific location in the Editor.
@@ -178,7 +181,7 @@ export const NodeTransforms: NodeTransforms = {
 
       if (Range.isRange(at)) {
         if (!hanging) {
-          at = Editor.unhangRange(editor, at)
+          at = Editor.unhangRange(editor, at, { voids })
         }
 
         if (Range.isCollapsed(at)) {
@@ -198,7 +201,7 @@ export const NodeTransforms: NodeTransforms = {
           } else if (editor.isInline(node)) {
             match = n => Text.isText(n) || Editor.isInline(editor, n)
           } else {
-            match = n => Editor.isBlock(editor, n)
+            match = n => Element.isElement(n) && Editor.isBlock(editor, n)
           }
         }
 
@@ -267,7 +270,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : n => Element.isElement(n) && Editor.isBlock(editor, n)
       }
 
       if (!at) {
@@ -338,12 +341,12 @@ export const NodeTransforms: NodeTransforms = {
           const [parent] = Editor.parent(editor, at)
           match = n => parent.children.includes(n)
         } else {
-          match = n => Editor.isBlock(editor, n)
+          match = n => Element.isElement(n) && Editor.isBlock(editor, n)
         }
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = Editor.unhangRange(editor, at)
+        at = Editor.unhangRange(editor, at, { voids })
       }
 
       if (Range.isRange(at)) {
@@ -406,9 +409,9 @@ export const NodeTransforms: NodeTransforms = {
         properties = rest as Partial<Element>
       } else {
         throw new Error(
-          `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${JSON.stringify(
+          `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${Scrubber.stringify(
             node
-          )} ${JSON.stringify(prevNode)}`
+          )} ${Scrubber.stringify(prevNode)}`
         )
       }
 
@@ -481,7 +484,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : n => Element.isElement(n) && Editor.isBlock(editor, n)
       }
 
       const toRef = Editor.pathRef(editor, to)
@@ -537,11 +540,11 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : n => Element.isElement(n) && Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = Editor.unhangRange(editor, at)
+        at = Editor.unhangRange(editor, at, { voids })
       }
 
       const depths = Editor.nodes(editor, { at, match, mode, voids })
@@ -592,11 +595,11 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : n => Element.isElement(n) && Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = Editor.unhangRange(editor, at)
+        at = Editor.unhangRange(editor, at, { voids })
       }
 
       if (split && Range.isRange(at)) {
@@ -704,7 +707,7 @@ export const NodeTransforms: NodeTransforms = {
       let { match, at = editor.selection, height = 0, always = false } = options
 
       if (match == null) {
-        match = n => Editor.isBlock(editor, n)
+        match = n => Element.isElement(n) && Editor.isBlock(editor, n)
       }
 
       if (Range.isRange(at)) {
@@ -779,7 +782,7 @@ export const NodeTransforms: NodeTransforms = {
           if (
             path.length < highestPath.length ||
             path.length === 0 ||
-            (!voids && Editor.isVoid(editor, node))
+            (!voids && Element.isElement(node) && Editor.isVoid(editor, node))
           ) {
             break
           }
@@ -823,6 +826,7 @@ export const NodeTransforms: NodeTransforms = {
       at?: Location
       match?: NodeMatch<T>
       mode?: MaximizeMode
+      hanging?: boolean
       split?: boolean
       voids?: boolean
     } = {}
@@ -866,7 +870,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : n => Element.isElement(n) && Editor.isBlock(editor, n)
       }
 
       if (Path.isPath(at)) {
@@ -933,9 +937,11 @@ export const NodeTransforms: NodeTransforms = {
         if (Path.isPath(at)) {
           match = matchPath(editor, at)
         } else if (editor.isInline(element)) {
-          match = n => Editor.isInline(editor, n) || Text.isText(n)
+          match = n =>
+            (Element.isElement(n) && Editor.isInline(editor, n)) ||
+            Text.isText(n)
         } else {
-          match = n => Editor.isBlock(editor, n)
+          match = n => Element.isElement(n) && Editor.isBlock(editor, n)
         }
       }
 
@@ -957,7 +963,7 @@ export const NodeTransforms: NodeTransforms = {
         Editor.nodes(editor, {
           at,
           match: editor.isInline(element)
-            ? n => Editor.isBlock(editor, n)
+            ? n => Element.isElement(n) && Editor.isBlock(editor, n)
             : n => Editor.isEditor(n),
           mode: 'lowest',
           voids,

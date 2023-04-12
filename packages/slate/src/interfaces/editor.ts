@@ -17,28 +17,28 @@ import {
   Text,
 } from '..'
 import {
-  DIRTY_PATHS,
+  getCharacterDistance,
+  getWordDistance,
+  splitByCharacterDistance,
+} from '../utils/string'
+import {
   DIRTY_PATH_KEYS,
+  DIRTY_PATHS,
   NORMALIZING,
   PATH_REFS,
   POINT_REFS,
   RANGE_REFS,
 } from '../utils/weak-maps'
-import {
-  getWordDistance,
-  getCharacterDistance,
-  splitByCharacterDistance,
-} from '../utils/string'
-import { Descendant } from './node'
 import { Element } from './element'
+import { Descendant } from './node'
 import {
   LeafEdge,
+  MaximizeMode,
+  RangeDirection,
   SelectionMode,
   TextDirection,
   TextUnit,
   TextUnitAdjustment,
-  RangeDirection,
-  MaximizeMode,
 } from './types'
 
 export type BaseSelection = Range | null
@@ -59,10 +59,13 @@ export interface BaseEditor {
   marks: EditorMarks | null
 
   // Schema-specific node behaviors.
+  isElementReadOnly: (element: Element) => boolean
   isInline: (element: Element) => boolean
+  isSelectable: (element: Element) => boolean
   isVoid: (element: Element) => boolean
-  normalizeNode: (entry: NodeEntry) => void
-  onChange: () => void
+  markableVoid: (element: Element) => boolean
+  normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
+  onChange: (options?: { operation?: Operation }) => void
 
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
@@ -77,6 +80,17 @@ export interface BaseEditor {
   insertNode: (node: Node) => void
   insertText: (text: string) => void
   removeMark: (key: string) => void
+  getDirtyPaths: (operation: Operation) => Path[]
+  shouldNormalize: ({
+    iteration,
+    dirtyPaths,
+    operation,
+  }: {
+    iteration: number
+    initialDirtyPathsLength: number
+    dirtyPaths: Path[]
+    operation?: Operation
+  }) => boolean
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
@@ -102,6 +116,12 @@ export interface EditorBeforeOptions {
 
 export interface EditorDirectedDeletionOptions {
   unit?: TextUnit
+}
+
+export interface EditorElementReadOnlyOptions {
+  at?: Location
+  mode?: MaximizeMode
+  voids?: boolean
 }
 
 export interface EditorFragmentDeletionOptions {
@@ -139,10 +159,12 @@ export interface EditorNodesOptions<T extends Node> {
   universal?: boolean
   reverse?: boolean
   voids?: boolean
+  ignoreNonSelectable?: boolean
 }
 
 export interface EditorNormalizeOptions {
   force?: boolean
+  operation?: Operation
 }
 
 export interface EditorParentOptions {
@@ -172,6 +194,7 @@ export interface EditorPositionsOptions {
   unit?: TextUnitAdjustment
   reverse?: boolean
   voids?: boolean
+  ignoreNonSelectable?: boolean
 }
 
 export interface EditorPreviousOptions<T extends Node> {
@@ -228,6 +251,10 @@ export interface EditorInterface {
     options?: EditorFragmentDeletionOptions
   ) => void
   edges: (editor: Editor, at: Location) => [Point, Point]
+  elementReadOnly: (
+    editor: Editor,
+    options?: EditorElementReadOnlyOptions
+  ) => NodeEntry<Element> | undefined
   end: (editor: Editor, at: Location) => Point
   first: (editor: Editor, at: Location) => NodeEntry
   fragment: (editor: Editor, at: Location) => Descendant[]
@@ -240,15 +267,17 @@ export interface EditorInterface {
   insertFragment: (editor: Editor, fragment: Node[]) => void
   insertNode: (editor: Editor, node: Node) => void
   insertText: (editor: Editor, text: string) => void
-  isBlock: (editor: Editor, value: any) => value is Element
+  isBlock: (editor: Editor, value: Element) => boolean
   isEditor: (value: any) => value is Editor
   isEnd: (editor: Editor, point: Point, at: Location) => boolean
   isEdge: (editor: Editor, point: Point, at: Location) => boolean
+  isElementReadOnly: (editor: Editor, element: Element) => boolean
   isEmpty: (editor: Editor, element: Element) => boolean
-  isInline: (editor: Editor, value: any) => value is Element
+  isInline: (editor: Editor, value: Element) => boolean
   isNormalizing: (editor: Editor) => boolean
+  isSelectable: (editor: Editor, element: Element) => boolean
   isStart: (editor: Editor, point: Point, at: Location) => boolean
-  isVoid: (editor: Editor, value: any) => value is Element
+  isVoid: (editor: Editor, value: Element) => boolean
   last: (editor: Editor, at: Location) => NodeEntry
   leaf: (
     editor: Editor,
@@ -326,6 +355,7 @@ export interface EditorInterface {
 
 const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
 
+// eslint-disable-next-line no-redeclare
 export const Editor: EditorInterface = {
   /**
    * Get the ancestor above a location in the document.
@@ -355,8 +385,18 @@ export const Editor: EditorInterface = {
       match,
       reverse,
     })) {
-      if (!Text.isText(n) && !Path.equals(path, p)) {
-        return [n, p]
+      if (Text.isText(n)) continue
+      if (Range.isRange(at)) {
+        if (
+          Path.isAncestor(p, at.anchor.path) &&
+          Path.isAncestor(p, at.focus.path)
+        ) {
+          return [n, p]
+        }
+      } else {
+        if (!Path.equals(path, p)) {
+          return [n, p]
+        }
       }
     }
   },
@@ -486,6 +526,20 @@ export const Editor: EditorInterface = {
   },
 
   /**
+   * Match a read-only element in the current branch of the editor.
+   */
+
+  elementReadOnly(
+    editor: Editor,
+    options: EditorElementReadOnlyOptions = {}
+  ): NodeEntry<Element> | undefined {
+    return Editor.above(editor, {
+      ...options,
+      match: n => Element.isElement(n) && Editor.isElementReadOnly(editor, n),
+    })
+  },
+
+  /**
    * Get the end point of a location.
    */
 
@@ -516,7 +570,9 @@ export const Editor: EditorInterface = {
    */
 
   hasBlocks(editor: Editor, element: Element): boolean {
-    return element.children.some(n => Editor.isBlock(editor, n))
+    return element.children.some(
+      n => Element.isElement(n) && Editor.isBlock(editor, n)
+    )
   },
 
   /**
@@ -591,8 +647,8 @@ export const Editor: EditorInterface = {
    * Check if a value is a block `Element` object.
    */
 
-  isBlock(editor: Editor, value: any): value is Element {
-    return Element.isElement(value) && !editor.isInline(value)
+  isBlock(editor: Editor, value: Element): boolean {
+    return !editor.isInline(value)
   },
 
   /**
@@ -600,11 +656,15 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    if (!isPlainObject(value)) return false
     const cachedIsEditor = IS_EDITOR_CACHE.get(value)
     if (cachedIsEditor !== undefined) {
       return cachedIsEditor
     }
+
+    if (!isPlainObject(value)) {
+      return false
+    }
+
     const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
@@ -616,11 +676,14 @@ export const Editor: EditorInterface = {
       typeof value.insertFragment === 'function' &&
       typeof value.insertNode === 'function' &&
       typeof value.insertText === 'function' &&
+      typeof value.isElementReadOnly === 'function' &&
       typeof value.isInline === 'function' &&
+      typeof value.isSelectable === 'function' &&
       typeof value.isVoid === 'function' &&
       typeof value.normalizeNode === 'function' &&
       typeof value.onChange === 'function' &&
       typeof value.removeMark === 'function' &&
+      typeof value.getDirtyPaths === 'function' &&
       (value.marks === null || isPlainObject(value.marks)) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
@@ -666,8 +729,16 @@ export const Editor: EditorInterface = {
    * Check if a value is an inline `Element` object.
    */
 
-  isInline(editor: Editor, value: any): value is Element {
-    return Element.isElement(value) && editor.isInline(value)
+  isInline(editor: Editor, value: Element): boolean {
+    return editor.isInline(value)
+  },
+
+  /**
+   * Check if a value is a read-only `Element` object.
+   */
+
+  isElementReadOnly(editor: Editor, value: Element): boolean {
+    return editor.isElementReadOnly(value)
   },
 
   /**
@@ -677,6 +748,14 @@ export const Editor: EditorInterface = {
   isNormalizing(editor: Editor): boolean {
     const isNormalizing = NORMALIZING.get(editor)
     return isNormalizing === undefined ? true : isNormalizing
+  },
+
+  /**
+   * Check if a value is a selectable `Element` object.
+   */
+
+  isSelectable(editor: Editor, value: Element): boolean {
+    return editor.isSelectable(value)
   },
 
   /**
@@ -697,8 +776,8 @@ export const Editor: EditorInterface = {
    * Check if a value is a void `Element` object.
    */
 
-  isVoid(editor: Editor, value: any): value is Element {
-    return Element.isElement(value) && editor.isVoid(value)
+  isVoid(editor: Editor, value: Element): boolean {
+    return editor.isVoid(value)
   },
 
   /**
@@ -753,7 +832,7 @@ export const Editor: EditorInterface = {
 
       levels.push([n, p])
 
-      if (!voids && Editor.isVoid(editor, n)) {
+      if (!voids && Element.isElement(n) && Editor.isVoid(editor, n)) {
         break
       }
     }
@@ -798,16 +877,24 @@ export const Editor: EditorInterface = {
 
     if (anchor.offset === 0) {
       const prev = Editor.previous(editor, { at: path, match: Text.isText })
-      const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+      const markedVoid = Editor.above(editor, {
+        match: n =>
+          Element.isElement(n) &&
+          Editor.isVoid(editor, n) &&
+          editor.markableVoid(n),
       })
+      if (!markedVoid) {
+        const block = Editor.above(editor, {
+          match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+        })
 
-      if (prev && block) {
-        const [prevNode, prevPath] = prev
-        const [, blockPath] = block
+        if (prev && block) {
+          const [prevNode, prevPath] = prev
+          const [, blockPath] = block
 
-        if (Path.isAncestor(blockPath, prevPath)) {
-          node = prevNode as Text
+          if (Path.isAncestor(blockPath, prevPath)) {
+            node = prevNode as Text
+          }
         }
       }
     }
@@ -884,6 +971,7 @@ export const Editor: EditorInterface = {
       universal = false,
       reverse = false,
       voids = false,
+      ignoreNonSelectable = false,
     } = options
     let { match } = options
 
@@ -912,13 +1000,32 @@ export const Editor: EditorInterface = {
       reverse,
       from,
       to,
-      pass: ([n]) => (voids ? false : Editor.isVoid(editor, n)),
+      pass: ([node]) => {
+        if (!Element.isElement(node)) return false
+        if (
+          !voids &&
+          (Editor.isVoid(editor, node) ||
+            Editor.isElementReadOnly(editor, node))
+        )
+          return true
+        if (ignoreNonSelectable && !Editor.isSelectable(editor, node))
+          return true
+        return false
+      },
     })
 
     const matches: NodeEntry<T>[] = []
     let hit: NodeEntry<T> | undefined
 
     for (const [node, path] of nodeEntries) {
+      if (
+        ignoreNonSelectable &&
+        Element.isElement(node) &&
+        !Editor.isSelectable(editor, node)
+      ) {
+        continue
+      }
+
       const isLower = hit && Path.compare(path, hit[1]) === 0
 
       // In highest mode any node lower than the last hit is not a match.
@@ -978,7 +1085,7 @@ export const Editor: EditorInterface = {
    */
 
   normalize(editor: Editor, options: EditorNormalizeOptions = {}): void {
-    const { force = false } = options
+    const { force = false, operation } = options
     const getDirtyPaths = (editor: Editor) => {
       return DIRTY_PATHS.get(editor) || []
     }
@@ -1028,19 +1135,25 @@ export const Editor: EditorInterface = {
             by definition adding children to an empty node can't cause other paths to change.
           */
           if (Element.isElement(node) && node.children.length === 0) {
-            editor.normalizeNode(entry)
+            editor.normalizeNode(entry, { operation })
           }
         }
       }
 
-      const max = getDirtyPaths(editor).length * 42 // HACK: better way?
-      let m = 0
+      let dirtyPaths = getDirtyPaths(editor)
+      const initialDirtyPathsLength = dirtyPaths.length
+      let iteration = 0
 
-      while (getDirtyPaths(editor).length !== 0) {
-        if (m > max) {
-          throw new Error(`
-            Could not completely normalize the editor after ${max} iterations! This is usually due to incorrect normalization logic that leaves a node in an invalid state.
-          `)
+      while (dirtyPaths.length !== 0) {
+        if (
+          !editor.shouldNormalize({
+            dirtyPaths,
+            iteration,
+            initialDirtyPathsLength,
+            operation,
+          })
+        ) {
+          return
         }
 
         const dirtyPath = popDirtyPath(editor)
@@ -1048,9 +1161,10 @@ export const Editor: EditorInterface = {
         // If the node doesn't exist in the tree, it does not need to be normalized.
         if (Node.has(editor, dirtyPath)) {
           const entry = Editor.node(editor, dirtyPath)
-          editor.normalizeNode(entry)
+          editor.normalizeNode(entry, { operation })
         }
-        m++
+        iteration++
+        dirtyPaths = getDirtyPaths(editor)
       }
     })
   },
@@ -1257,6 +1371,7 @@ export const Editor: EditorInterface = {
       unit = 'offset',
       reverse = false,
       voids = false,
+      ignoreNonSelectable = false,
     } = options
 
     if (!at) {
@@ -1296,7 +1411,12 @@ export const Editor: EditorInterface = {
     // encounter the block node, then all of its text nodes, so when iterating
     // through the blockText and leafText we just need to remember a window of
     // one block node and leaf node, respectively.
-    for (const [node, path] of Editor.nodes(editor, { at, reverse, voids })) {
+    for (const [node, path] of Editor.nodes(editor, {
+      at,
+      reverse,
+      voids,
+      ignoreNonSelectable,
+    })) {
       /*
        * ELEMENT NODE - Yield position(s) for voids, collect blockText for blocks
        */
@@ -1304,11 +1424,8 @@ export const Editor: EditorInterface = {
         // Void nodes are a special case, so by default we will always
         // yield their first point. If the `voids` option is set to true,
         // then we will iterate over their content.
-        if (!voids && editor.isVoid(node)) {
+        if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
           yield Editor.start(editor, path)
-          // It's possible the start of the range we're iterating over is in a void, in which case
-          // we want to make sure we don't incorrectly yield the start of a subsequent text node for unit !== 'offset'
-          isNewBlock = false
           continue
         }
 
@@ -1617,13 +1734,19 @@ export const Editor: EditorInterface = {
     let [start, end] = Range.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    if (
+      start.offset !== 0 ||
+      end.offset !== 0 ||
+      Range.isCollapsed(range) ||
+      Path.hasPrevious(end.path)
+    ) {
       return range
     }
 
     const endBlock = Editor.above(editor, {
       at: end,
-      match: n => Editor.isBlock(editor, n),
+      match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+      voids,
     })
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, start)
@@ -1660,7 +1783,7 @@ export const Editor: EditorInterface = {
   ): NodeEntry<Element> | undefined {
     return Editor.above(editor, {
       ...options,
-      match: n => Editor.isVoid(editor, n),
+      match: n => Element.isElement(n) && Editor.isVoid(editor, n),
     })
   },
 

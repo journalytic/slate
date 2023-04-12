@@ -1,27 +1,41 @@
 import ReactDOM from 'react-dom'
 import {
+  BaseEditor,
   Editor,
+  Element,
   Node,
-  Path,
   Operation,
-  Transforms,
+  Path,
+  Point,
   Range,
+  Transforms,
 } from '@journalytic/slate'
-
-import { ReactEditor } from './react-editor'
+import {
+  TextDiff,
+  transformPendingPoint,
+  transformPendingRange,
+  transformTextDiff,
+} from '../utils/diff-text'
+import {
+  getPlainText,
+  getSlateFragmentAttribute,
+  isDOMText,
+} from '../utils/dom'
 import { Key } from '../utils/key'
+import { findCurrentLineRange } from '../utils/lines'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
   EDITOR_TO_ON_CHANGE,
-  NODE_TO_KEY,
+  EDITOR_TO_PENDING_ACTION,
+  EDITOR_TO_PENDING_DIFFS,
+  EDITOR_TO_PENDING_INSERTION_MARKS,
+  EDITOR_TO_PENDING_SELECTION,
+  EDITOR_TO_SCHEDULE_FLUSH,
+  EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
+  NODE_TO_KEY,
 } from '../utils/weak-maps'
-import {
-  isDOMText,
-  getPlainText,
-  getSlateFragmentAttribute,
-} from '../utils/dom'
-import { findCurrentLineRange } from '../utils/lines'
+import { ReactEditor } from './react-editor'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
@@ -32,37 +46,72 @@ import { findCurrentLineRange } from '../utils/lines'
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
-export const withReact = <T extends Editor>(editor: T) => {
+export const withReact = <T extends BaseEditor>(
+  editor: T,
+  clipboardFormatKey = 'x-slate-fragment'
+): T & ReactEditor => {
   const e = editor as T & ReactEditor
-  const { apply, onChange, deleteBackward } = e
+  const { apply, onChange, deleteBackward, addMark, removeMark } = e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
   EDITOR_TO_KEY_TO_ELEMENT.set(e, new WeakMap())
+
+  e.addMark = (key, value) => {
+    EDITOR_TO_SCHEDULE_FLUSH.get(e)?.()
+
+    if (
+      !EDITOR_TO_PENDING_INSERTION_MARKS.get(e) &&
+      EDITOR_TO_PENDING_DIFFS.get(e)?.length
+    ) {
+      // Ensure the current pending diffs originating from changes before the addMark
+      // are applied with the current formatting
+      EDITOR_TO_PENDING_INSERTION_MARKS.set(e, null)
+    }
+
+    EDITOR_TO_USER_MARKS.delete(e)
+
+    addMark(key, value)
+  }
+
+  e.removeMark = key => {
+    if (
+      !EDITOR_TO_PENDING_INSERTION_MARKS.get(e) &&
+      EDITOR_TO_PENDING_DIFFS.get(e)?.length
+    ) {
+      // Ensure the current pending diffs originating from changes before the addMark
+      // are applied with the current formatting
+      EDITOR_TO_PENDING_INSERTION_MARKS.set(e, null)
+    }
+
+    EDITOR_TO_USER_MARKS.delete(e)
+
+    removeMark(key)
+  }
 
   e.deleteBackward = unit => {
     if (unit !== 'line') {
       return deleteBackward(unit)
     }
 
-    if (editor.selection && Range.isCollapsed(editor.selection)) {
-      const parentBlockEntry = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
-        at: editor.selection,
+    if (e.selection && Range.isCollapsed(e.selection)) {
+      const parentBlockEntry = Editor.above(e, {
+        match: n => Element.isElement(n) && Editor.isBlock(e, n),
+        at: e.selection,
       })
 
       if (parentBlockEntry) {
         const [, parentBlockPath] = parentBlockEntry
         const parentElementRange = Editor.range(
-          editor,
+          e,
           parentBlockPath,
-          editor.selection.anchor
+          e.selection.anchor
         )
 
         const currentLineRange = findCurrentLineRange(e, parentElementRange)
 
         if (!Range.isCollapsed(currentLineRange)) {
-          Transforms.delete(editor, { at: currentLineRange })
+          Transforms.delete(e, { at: currentLineRange })
         }
       }
     }
@@ -72,6 +121,32 @@ export const withReact = <T extends Editor>(editor: T) => {
   // as apply() changes the object reference and hence invalidates the NODE_TO_KEY entry
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
+
+    const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(e)
+    if (pendingDiffs?.length) {
+      const transformed = pendingDiffs
+        .map(textDiff => transformTextDiff(textDiff, op))
+        .filter(Boolean) as TextDiff[]
+
+      EDITOR_TO_PENDING_DIFFS.set(e, transformed)
+    }
+
+    const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(e)
+    if (pendingSelection) {
+      EDITOR_TO_PENDING_SELECTION.set(
+        e,
+        transformPendingRange(e, pendingSelection, op)
+      )
+    }
+
+    const pendingAction = EDITOR_TO_PENDING_ACTION.get(e)
+    if (pendingAction?.at) {
+      const at = Point.isPoint(pendingAction?.at)
+        ? transformPendingPoint(e, pendingAction.at, op)
+        : transformPendingRange(e, pendingAction.at, op)
+
+      EDITOR_TO_PENDING_ACTION.set(e, at ? { ...pendingAction, at } : null)
+    }
 
     switch (op.type) {
       case 'insert_text':
@@ -84,8 +159,8 @@ export const withReact = <T extends Editor>(editor: T) => {
 
       case 'set_selection': {
         // Selection was manually set, don't restore the user selection after the change.
-        EDITOR_TO_USER_SELECTION.get(editor)?.unref()
-        EDITOR_TO_USER_SELECTION.delete(editor)
+        EDITOR_TO_USER_SELECTION.get(e)?.unref()
+        EDITOR_TO_USER_SELECTION.delete(e)
         break
       }
 
@@ -192,7 +267,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     const string = JSON.stringify(fragment)
     const encoded = window.btoa(encodeURIComponent(string))
     attach.setAttribute('data-slate-fragment', encoded)
-    data.setData('application/x-slate-fragment', encoded)
+    data.setData(`application/${clipboardFormatKey}`, encoded)
 
     // Add the content to a <div> so that we can get its inner HTML.
     const div = contents.ownerDocument.createElement('div')
@@ -216,7 +291,7 @@ export const withReact = <T extends Editor>(editor: T) => {
      * Checking copied fragment from application/x-slate-fragment or data-slate-fragment
      */
     const fragment =
-      data.getData('application/x-slate-fragment') ||
+      data.getData(`application/${clipboardFormatKey}`) ||
       getSlateFragmentAttribute(data)
 
     if (fragment) {
@@ -248,7 +323,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     return false
   }
 
-  e.onChange = () => {
+  e.onChange = options => {
     // COMPAT: React doesn't batch `setState` hook calls, which means that the
     // children and selection can get out of sync for one render pass. So we
     // have to use this unstable API to ensure it batches them. (2019/12/03)
@@ -260,7 +335,7 @@ export const withReact = <T extends Editor>(editor: T) => {
         onContextChange()
       }
 
-      onChange()
+      onChange(options)
     })
   }
 

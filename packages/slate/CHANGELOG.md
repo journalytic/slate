@@ -1,5 +1,141 @@
 # slate
 
+## 0.93.0
+
+### Minor Changes
+
+- [#5374](https://github.com/ianstormtaylor/slate/pull/5374) [`b52e08b0`](https://github.com/ianstormtaylor/slate/commit/b52e08b0eafdcf1c77439e282c9dc89a4c72fbf1) Thanks [@12joan](https://github.com/12joan)! - - Add `isSelectable` to `editor` (default true). A non-selectable element is skipped over when navigating using arrow keys.
+  - Add `ignoreNonSelectable` to `Editor.nodes`, `Editor.positions`, `Editor.after` and `Editor.before` (default false)
+  - `Transforms.move` ignores non-selectable elements
+
+* [#5374](https://github.com/ianstormtaylor/slate/pull/5374) [`b52e08b0`](https://github.com/ianstormtaylor/slate/commit/b52e08b0eafdcf1c77439e282c9dc89a4c72fbf1) Thanks [@12joan](https://github.com/12joan)! - - Add `isElementReadOnly` to `editor`. A read-only element behaves much like a void with regard to selection and deletion, but renders its `children` the same as any other non-void node.
+
+## 0.91.4
+
+### Patch Changes
+
+- [#5311](https://github.com/ianstormtaylor/slate/pull/5311) [`0ac72a62`](https://github.com/ianstormtaylor/slate/commit/0ac72a626c41a9e259dc945b408d09367eca4b3f) Thanks [@zbeyens](https://github.com/zbeyens)! - Fix #5295 regression. `editor.shouldNormalize` new option: `initialDirtyPathsLength: number`
+
+## 0.91.3
+
+### Patch Changes
+
+- [#5295](https://github.com/ianstormtaylor/slate/pull/5295) [`84f811a7`](https://github.com/ianstormtaylor/slate/commit/84f811a79c9b76050cb3dbe424efca3192cc44c6) Thanks [@zbeyens](https://github.com/zbeyens)! - New `editor` method that can be overridden to control when the normalization should stop. Default behavior (unchanged) is to throw an error when it iterates over 42 times the dirty paths length.
+
+  ```ts
+  shouldNormalize: ({
+    iteration,
+    dirtyPaths,
+    operation,
+  }: {
+    iteration: number
+    dirtyPaths: Path[]
+    operation?: Operation
+  }) => boolean
+  ```
+
+  - `editor.onChange` signature change: `(options?: { operation?: Operation }) => void` where `operation` is triggering the function.
+  - `editor.normalizeNode` signature change: `(entry: NodeEntry, options?: { operation?: Operation }) => void` where `operation` is triggering the function.
+  - `EditorNormalizeOptions` new option `operation?: Operation` where `operation` is triggering the function.
+
+## 0.91.1
+
+### Patch Changes
+
+- [#5251](https://github.com/ianstormtaylor/slate/pull/5251) [`6fa4b954`](https://github.com/ianstormtaylor/slate/commit/6fa4b954a5e4c67cff87d00b1253b2a838c0db94) Thanks [@YaoKaiLun](https://github.com/YaoKaiLun)! - Fix the cursor jump to an unexpected position after deleting in android
+
+## 0.90.0
+
+### Patch Changes
+
+- [#5278](https://github.com/ianstormtaylor/slate/pull/5278) [`9c4097a2`](https://github.com/ianstormtaylor/slate/commit/9c4097a26fa92718e6f4fc1f984a70fb5af42ca2) Thanks [@kylemclean](https://github.com/kylemclean)! - Revert to using inline styles for default editor styles
+
+## 0.88.1
+
+### Patch Changes
+
+- [#5235](https://github.com/ianstormtaylor/slate/pull/5235) [`36203b3f`](https://github.com/ianstormtaylor/slate/commit/36203b3f10fc1ee154923c7c75ce7912fec1e6f7) Thanks [@ppiotrowicz](https://github.com/ppiotrowicz)! - Fixed Editor.above method that always returned undefined with Point location
+
+## 0.87.0
+
+### Minor Changes
+
+- [#5206](https://github.com/ianstormtaylor/slate/pull/5206) [`96b7fcdb`](https://github.com/ianstormtaylor/slate/commit/96b7fcdbf98a7c8908f5d9613d9898cb24a8ae47) Thanks [@kylemclean](https://github.com/kylemclean)! - Use stylesheet for default styles on Editable components
+
+## 0.86.0
+
+### Patch Changes
+
+- [#5189](https://github.com/ianstormtaylor/slate/pull/5189) [`fbc9838f`](https://github.com/ianstormtaylor/slate/commit/fbc9838fd72e78bfa9af49013981939773dcca11) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Add hanging option to unsetNodes so it matches setNodes
+
+* [#5193](https://github.com/ianstormtaylor/slate/pull/5193) [`6909a8f7`](https://github.com/ianstormtaylor/slate/commit/6909a8f7da0f70b1ef3b5c3a665e8d0d09e6fa99) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Stops Editor.unhangRange() from adjusting the range in some cases when it was not actually hanging
+
+- [#5186](https://github.com/ianstormtaylor/slate/pull/5186) [`e416d00b`](https://github.com/ianstormtaylor/slate/commit/e416d00b6c95d05a1e10f738bfbbddd6cb940ab6) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Report marks applied to a markableVoid if selection is collapsed
+
+## 0.85.0
+
+### Patch Changes
+
+- [#5135](https://github.com/ianstormtaylor/slate/pull/5135) [`346f6572`](https://github.com/ianstormtaylor/slate/commit/346f6572fc8fdb6504bb18d8676f5bdeef7014eb) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Allow void elements to receive marks via markableVoid()
+
+* [#5168](https://github.com/ianstormtaylor/slate/pull/5168) [`3c49ff28`](https://github.com/ianstormtaylor/slate/commit/3c49ff28b3d188f69d8361bd682b7e8d0a1c13b6) Thanks [@i-artist](https://github.com/i-artist)! - Fixed above method that failed to get parentEntry when selection was range
+
+## 0.84.0
+
+### Minor Changes
+
+- [#5137](https://github.com/ianstormtaylor/slate/pull/5137) [`a2184d86`](https://github.com/ianstormtaylor/slate/commit/a2184d86571cfd0d89beb67863c444a988174937) Thanks [@mainhanu](https://github.com/mainhanu)! - transform.delete and transform.insertFragment performance optimize
+
+## 0.82.1
+
+### Patch Changes
+
+- [#5069](https://github.com/ianstormtaylor/slate/pull/5069) [`46d113fe`](https://github.com/ianstormtaylor/slate/commit/46d113fe1e102c87772681fdd90a086e37a3200d) Thanks [@krenzke](https://github.com/krenzke)! - Expose getDirtyPaths method on Editor object to allow for customization
+
+## 0.82.0
+
+### Patch Changes
+
+- [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
+## 0.81.3
+
+### Patch Changes
+
+- [#5042](https://github.com/ianstormtaylor/slate/pull/5042) [`11a93e65`](https://github.com/ianstormtaylor/slate/commit/11a93e65de4b197a43777e575caf13d7a05d5dc9) Thanks [@bryanph](https://github.com/bryanph)! - Upgrade next.js and source-map-loader packages
+
+* [#5018](https://github.com/ianstormtaylor/slate/pull/5018) [`f13cd6b9`](https://github.com/ianstormtaylor/slate/commit/f13cd6b9180e18201b2a001b6f5d109218071319) Thanks [@ulion](https://github.com/ulion)! - Fix for insertFragment text/inline + block mixed fragments.
+
+## 0.81.2
+
+### Patch Changes
+
+- [#5029](https://github.com/ianstormtaylor/slate/pull/5029) [`736662f8`](https://github.com/ianstormtaylor/slate/commit/736662f80838902f8560554fae704c13c5d8e227) Thanks [@hanagejet](https://github.com/hanagejet)! - fix: `Path.previous()` dose not working when path is `null`
+
+## 0.81.1
+
+### Patch Changes
+
+- [#5015](https://github.com/ianstormtaylor/slate/pull/5015) [`9ae37287`](https://github.com/ianstormtaylor/slate/commit/9ae372875df1ee3ef6041f5d6bd2f57ee8291ea0) Thanks [@tithanayut](https://github.com/tithanayut)! - Fix deleteBackward behavior for Thai script where deleting N character(s) backward should delete
+  N code point(s) instead of an entire grapheme cluster
+
+## 0.81.0
+
+### Minor Changes
+
+- [#4999](https://github.com/ianstormtaylor/slate/pull/4999) [`fe13a8f9`](https://github.com/ianstormtaylor/slate/commit/fe13a8f9e750569342ee004951e34233ab6614bf) Thanks [@alexandercampbell](https://github.com/alexandercampbell)! - Add new Slate.Scrubber interface to allow scrubbing end user data from exception
+  text. The default behavior remains unchanged.
+
+## 0.80.0
+
+### Minor Changes
+
+- [#4892](https://github.com/ianstormtaylor/slate/pull/4892) [`d2fc25c3`](https://github.com/ianstormtaylor/slate/commit/d2fc25c3c31453597f59cd2ac6ba087a1beb1fe3) Thanks [@suilang](https://github.com/suilang)! - update insertText logic when selection is not collapsed
+
+### Patch Changes
+
+- [#5008](https://github.com/ianstormtaylor/slate/pull/5008) [`e9ea2815`](https://github.com/ianstormtaylor/slate/commit/e9ea2815950fc6b78fb0a2ba0e5d95c8553ac023) Thanks [@steve-codaio](https://github.com/steve-codaio)! - Revert to previous position behavior around inline voids
+
 ## 0.78.0
 
 ### Minor Changes

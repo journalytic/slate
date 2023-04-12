@@ -1,5 +1,247 @@
 # slate-react
 
+## 0.93.0
+
+### Patch Changes
+
+- [#5383](https://github.com/ianstormtaylor/slate/pull/5383) [`3c3ea29a`](https://github.com/ianstormtaylor/slate/commit/3c3ea29a2d7c70bab3629f0f78ea28dca4058b53) Thanks [@12joan](https://github.com/12joan)! - Fix issue when tabbing into editor in Safari (https://github.com/udecode/plate/issues/2315)
+
+* [#5368](https://github.com/ianstormtaylor/slate/pull/5368) [`5a0d3974`](https://github.com/ianstormtaylor/slate/commit/5a0d3974d6cb2c099dff4c0976e9390d24c345ad) Thanks [@edhager](https://github.com/edhager)! - Delay rendering of placeholder to avoid IME hiding
+
+## 0.92.0
+
+### Minor Changes
+
+- [#5363](https://github.com/ianstormtaylor/slate/pull/5363) [`d42cd005`](https://github.com/ianstormtaylor/slate/commit/d42cd005db862165f5ac63fba4d35f36d92864f6) Thanks [@aciccarello](https://github.com/aciccarello)! - update dependencies on react hooks to be more senstive to changes
+
+  The code should now meet eslint react hook standards
+
+  This could result in more renders
+
+  closes #3886
+
+### Patch Changes
+
+- [#5369](https://github.com/ianstormtaylor/slate/pull/5369) [`556a4565`](https://github.com/ianstormtaylor/slate/commit/556a4565d2bb4a611d34bb30ecd9bac324664066) Thanks [@alex-vladut](https://github.com/alex-vladut)! - Allow copying from editable void input
+
+## 0.91.11
+
+### Patch Changes
+
+- [#5362](https://github.com/ianstormtaylor/slate/pull/5362) [`43999356`](https://github.com/ianstormtaylor/slate/commit/439993569001f8c5dc9e68194c198d430a4ef4bc) Thanks [@jason0x43](https://github.com/jason0x43)! - Fix an issue where pastes in Safari wouldn't include application/x-slate-fragment data
+
+* [#5359](https://github.com/ianstormtaylor/slate/pull/5359) [`9825d29b`](https://github.com/ianstormtaylor/slate/commit/9825d29b87ffff96b4cdfd7339028cc1a92c6f68) Thanks [@jason0x43](https://github.com/jason0x43)! - Fix an issue on Android where content containing a newline wouldn't be pasted properly
+
+## 0.91.10
+
+### Patch Changes
+
+- [#5346](https://github.com/ianstormtaylor/slate/pull/5346) [`a5e833f6`](https://github.com/ianstormtaylor/slate/commit/a5e833f6550a823689e593317f4579127d8a7fd7) Thanks [@edhager](https://github.com/edhager)! - Fix a problem with Editable not calling the decorate function passed as a prop when it should.
+
+* [#5343](https://github.com/ianstormtaylor/slate/pull/5343) [`f7f02a8b`](https://github.com/ianstormtaylor/slate/commit/f7f02a8b23f16a3f3103302343e3326549917892) Thanks [@12joan](https://github.com/12joan)! - Fix error when triple-clicking a word preceding a `contenteditable="false"` DOM node in Chrome
+
+## 0.91.9
+
+### Patch Changes
+
+- [#5339](https://github.com/ianstormtaylor/slate/pull/5339) [`62f8ddd9`](https://github.com/ianstormtaylor/slate/commit/62f8ddd9713617bf474968a10b69c24b71074b41) Thanks [@12joan](https://github.com/12joan)! - Fixes #5335. To prevent performance issues, make sure to wrap custom `renderPlaceholder` values in `useCallback`.
+
+## 0.91.8
+
+### Patch Changes
+
+- [#5325](https://github.com/ianstormtaylor/slate/pull/5325) [`af3f828b`](https://github.com/ianstormtaylor/slate/commit/af3f828b1206409951708b823fb32965b67c798f) Thanks [@clauderic](https://github.com/clauderic)! - Fix edge-cases in the Android input manager when text leaf nodes are deleted, such as when deleting text leaf nodes adjacent to inline void nodes.
+
+* [#5327](https://github.com/ianstormtaylor/slate/pull/5327) [`4205e0f0`](https://github.com/ianstormtaylor/slate/commit/4205e0f002929f575f34ef8bb5d3bf9d2670d9d7) Thanks [@YasinChan](https://github.com/YasinChan)! - Fix the issue of composition API and beforeinput event triggering between Chrome versions 60-75 on the Android platform.
+
+## 0.91.7
+
+### Patch Changes
+
+- [#5322](https://github.com/ianstormtaylor/slate/pull/5322) [`836f6600`](https://github.com/ianstormtaylor/slate/commit/836f660054c6fd4ced793cfa28349543b8db9890) Thanks [@edhager](https://github.com/edhager)! - Add checks to Editable selection change handler to avoid errors
+
+## 0.91.6
+
+### Patch Changes
+
+- [#5315](https://github.com/ianstormtaylor/slate/pull/5315) [`5784a38b`](https://github.com/ianstormtaylor/slate/commit/5784a38b6bd0f7de50efc890a4d6ceb8fafe191b) Thanks [@clauderic](https://github.com/clauderic)! - The `RestoreDOM` manager that is used Android no longer restores the DOM to its previous state for text mutations. This allows the editor state to be reconciled during a composition without interrupting the composition, as programatically updating the `textContent` of a text node ends the current composition.
+
+* [#5315](https://github.com/ianstormtaylor/slate/pull/5315) [`5784a38b`](https://github.com/ianstormtaylor/slate/commit/5784a38b6bd0f7de50efc890a4d6ceb8fafe191b) Thanks [@clauderic](https://github.com/clauderic)! - Fixed consumer defined `onInput` event handler not being invoked when passed to the `<Editable>` component.
+
+## 0.91.5
+
+### Patch Changes
+
+- [#5313](https://github.com/ianstormtaylor/slate/pull/5313) [`3bf568ed`](https://github.com/ianstormtaylor/slate/commit/3bf568ede2a1df91ff4f88402e0cdd848848f2fb) Thanks [@edhager](https://github.com/edhager)! - Some code clean-up in Editable.
+
+* [#5306](https://github.com/ianstormtaylor/slate/pull/5306) [`213edbbf`](https://github.com/ianstormtaylor/slate/commit/213edbbf3abc407532aeda72e40d6f01d368c33c) Thanks [@clauderic](https://github.com/clauderic)! - Use memoization to avoid unnecessary `textContent` updates in `<TextString>` component.
+
+## 0.91.4
+
+### Patch Changes
+
+- [#5310](https://github.com/ianstormtaylor/slate/pull/5310) [`b94254d6`](https://github.com/ianstormtaylor/slate/commit/b94254d694c6ea6c88cacd661e7bd77165cd2607) Thanks [@etrepum](https://github.com/etrepum)! - Fix to ensure that the latest versions of onChange and renderPlaceholder are used
+
+## 0.91.3
+
+### Patch Changes
+
+- [#5305](https://github.com/ianstormtaylor/slate/pull/5305) [`11adbf96`](https://github.com/ianstormtaylor/slate/commit/11adbf966c764ffde866be38ada2d32e00105e48) Thanks [@alex-vladut](https://github.com/alex-vladut)! - Allow pasting plain text into editable voids
+
+## 0.91.2
+
+### Patch Changes
+
+- [#5297](https://github.com/ianstormtaylor/slate/pull/5297) [`967d99eb`](https://github.com/ianstormtaylor/slate/commit/967d99eb36df798ac3163c7d15a01e64fee0668c) Thanks [@edhager](https://github.com/edhager)! - Fix memory leaks by adding clean-up code that looks for ref resets in Editable and Text.
+
+## 0.91.1
+
+### Patch Changes
+
+- [#5251](https://github.com/ianstormtaylor/slate/pull/5251) [`6fa4b954`](https://github.com/ianstormtaylor/slate/commit/6fa4b954a5e4c67cff87d00b1253b2a838c0db94) Thanks [@YaoKaiLun](https://github.com/YaoKaiLun)! - Fix the cursor jump to an unexpected position after deleting in android
+
+## 0.91.0
+
+### Minor Changes
+
+- [#5267](https://github.com/ianstormtaylor/slate/pull/5267) [`463edbd2`](https://github.com/ianstormtaylor/slate/commit/463edbd27ed78a4b4a3d38886da4d9e3e8b8efd5) Thanks [@ilya2204](https://github.com/ilya2204)! - Allow to change clipboard fragment format name
+
+* [#5271](https://github.com/ianstormtaylor/slate/pull/5271) [`9635b992`](https://github.com/ianstormtaylor/slate/commit/9635b992a0d91cecd45e3b6a883a860f14bcaaea) Thanks [@dsvgit](https://github.com/dsvgit)! - If TextComponent decorations keep the same offsets and only paths are changed, prevent re-rendering because only decoration offsets matter when leaves are calculated.
+
+## 0.90.0
+
+### Minor Changes
+
+- [#5278](https://github.com/ianstormtaylor/slate/pull/5278) [`9c4097a2`](https://github.com/ianstormtaylor/slate/commit/9c4097a26fa92718e6f4fc1f984a70fb5af42ca2) Thanks [@kylemclean](https://github.com/kylemclean)! - Revert to using inline styles for default editor styles
+
+## 0.89.0
+
+### Minor Changes
+
+- [#5275](https://github.com/ianstormtaylor/slate/pull/5275) [`5bc69d8d`](https://github.com/ianstormtaylor/slate/commit/5bc69d8d657c57eef06aeaa1fa198840d36939c7) Thanks [@12joan](https://github.com/12joan)! - Firefox: fix wrong text highlighting with double-click
+
+### Patch Changes
+
+- [#5265](https://github.com/ianstormtaylor/slate/pull/5265) [`3cf51f4d`](https://github.com/ianstormtaylor/slate/commit/3cf51f4d88e8e91faa6ab5d1f2c5f8c8e505ae89) Thanks [@kylemclean](https://github.com/kylemclean)! - Improve compatibility for browsers that do not support ResizeObserver or :where selector
+
+## 0.88.2
+
+### Patch Changes
+
+- [#5259](https://github.com/ianstormtaylor/slate/pull/5259) [`d7de564d`](https://github.com/ianstormtaylor/slate/commit/d7de564d62848dd8e14535993083c5e9aa1bfacc) Thanks [@Jacfem](https://github.com/Jacfem)! - Updates the selection correctly in readonly shadowdom
+
+* [#5252](https://github.com/ianstormtaylor/slate/pull/5252) [`179d5c92`](https://github.com/ianstormtaylor/slate/commit/179d5c926eecfdb2b3d8a75c07cb89181c348ad1) Thanks [@frellica](https://github.com/frellica)! - remove qq browser from `beforeinput` compat list because it had updated its chromium core to version 94
+
+## 0.88.0
+
+### Minor Changes
+
+- [#5226](https://github.com/ianstormtaylor/slate/pull/5226) [`0141f683`](https://github.com/ianstormtaylor/slate/commit/0141f683659025c7e851c11274cf200da05fd31e) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Check if getBoundingClientRect exist before trying to call bind on it. Makes unit testing experience agains Editable nicer
+
+## 0.87.1
+
+### Patch Changes
+
+- [#5223](https://github.com/ianstormtaylor/slate/pull/5223) [`120437d6`](https://github.com/ianstormtaylor/slate/commit/120437d61237eeb8df4ed0db92af31698e910eda) Thanks [@alex-vladut](https://github.com/alex-vladut)! - Fix issue preventing editing and copy/paste into editable voids
+
+## 0.87.0
+
+### Minor Changes
+
+- [#5206](https://github.com/ianstormtaylor/slate/pull/5206) [`96b7fcdb`](https://github.com/ianstormtaylor/slate/commit/96b7fcdbf98a7c8908f5d9613d9898cb24a8ae47) Thanks [@kylemclean](https://github.com/kylemclean)! - Use stylesheet for default styles on Editable components
+
+## 0.86.0
+
+### Minor Changes
+
+- [#5121](https://github.com/ianstormtaylor/slate/pull/5121) [`06942c6d`](https://github.com/ianstormtaylor/slate/commit/06942c6d7e4b8418a467f022750b010491dbdbe7) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Make it possible to copy/paste void elements
+
+## 0.83.2
+
+### Patch Changes
+
+- [#5148](https://github.com/ianstormtaylor/slate/pull/5148) [`a2b6786d`](https://github.com/ianstormtaylor/slate/commit/a2b6786d19f8bd5f779c526742a4dc3da971f696) Thanks [@ksimons](https://github.com/ksimons)! - Ensure the min-height for placeholders is set on the correct editor
+- [#5155](https://github.com/ianstormtaylor/slate/pull/5154) [`1b14de5`](https://github.com/ianstormtaylor/slate/commit/1b14de5f8e5961ac36eced229abea9abb5be71f9) Thanks [@jameshfisher](https://github.com/jameshfisher) - Revert insertText breaking change that deletes fragment
+
+## 0.83.1
+
+### Patch Changes
+
+- [#5143](https://github.com/ianstormtaylor/slate/pull/5143) [`347865ca`](https://github.com/ianstormtaylor/slate/commit/347865cafc1f2f3b0fc3d74d8758e082480df6ca) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix scrollIntoView when selection is collapsed inside mark placeholder
+
+## 0.83.0
+
+### Minor Changes
+
+- [#5123](https://github.com/ianstormtaylor/slate/pull/5123) [`0eb37e79`](https://github.com/ianstormtaylor/slate/commit/0eb37e79150275d3535f1694d8972751a83d826f) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Make it possible to delete block elements with backspace in Chrome and Safari
+
+### Patch Changes
+
+- [#5127](https://github.com/ianstormtaylor/slate/pull/5127) [`341041f0`](https://github.com/ianstormtaylor/slate/commit/341041f0b721926cca3f9dee98dc4589f2c96797) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Cleanup and fix insertion placeholder mark compare
+
+## 0.82.2
+
+### Patch Changes
+
+- [#5120](https://github.com/ianstormtaylor/slate/pull/5120) [`9815bdab`](https://github.com/ianstormtaylor/slate/commit/9815bdabdd34221ed86f68b556cfa43d845e2db0) Thanks [@hueyhe](https://github.com/hueyhe)! - Fix editor selection out of sync in readonly mode
+
+* [#5100](https://github.com/ianstormtaylor/slate/pull/5100) [`8eb1972b`](https://github.com/ianstormtaylor/slate/commit/8eb1972b5b2f9489936b1759afb76574040af5a0) Thanks [@KittyGiraudel](https://github.com/KittyGiraudel)! - Add `aria-multiline` attribute to textbox editor
+
+- [#5105](https://github.com/ianstormtaylor/slate/pull/5105) [`55b95740`](https://github.com/ianstormtaylor/slate/commit/55b9574097f6008bda7ed8e3cb7aa9dd607d9f49) Thanks [@yume-chan](https://github.com/yume-chan)! - Change `Element` component to use callback-style ref to reliably track DOM node of rendered custom elements
+
+## 0.82.1
+
+### Patch Changes
+
+- [#5084](https://github.com/ianstormtaylor/slate/pull/5084) [`50de780b`](https://github.com/ianstormtaylor/slate/commit/50de780b1c32fa2c52ad88d42031748f9d3944e9) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix selection handling with slow flush in mark placeholders on android, fix auto-capitalize after placeholder
+
+* [#5091](https://github.com/ianstormtaylor/slate/pull/5091) [`e18879e7`](https://github.com/ianstormtaylor/slate/commit/e18879e728077b09580b29e9a6683aaa66629bc5) Thanks [@e1himself](https://github.com/e1himself)! - Fix `withReact()` function type definition
+
+## 0.82.0
+
+### Minor Changes
+
+- [#5041](https://github.com/ianstormtaylor/slate/pull/5041) [`9bc0b613`](https://github.com/ianstormtaylor/slate/commit/9bc0b6132aa288a37ae9a85d0e59a9d5a75ebdd7) Thanks [@bryanph](https://github.com/bryanph)! - - Introduces a `useSlateSelection` hook that triggers whenever the selection changes.
+  - This also changes the implementation of SlateContext to use an incrementing value instead of an array replace to trigger updates
+  - Introduces a `useSlateWithV` hook that includes the version counter which can be used to prevent re-renders
+
+* [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
+## 0.81.3
+
+### Patch Changes
+
+- [#5054](https://github.com/ianstormtaylor/slate/pull/5054) [`1cc0797f`](https://github.com/ianstormtaylor/slate/commit/1cc0797f53f22e650198c83192ba5fc35c525a15) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix toSlatePoint in void nodes with nested editors if children are rendered as the last child
+
+* [#5042](https://github.com/ianstormtaylor/slate/pull/5042) [`11a93e65`](https://github.com/ianstormtaylor/slate/commit/11a93e65de4b197a43777e575caf13d7a05d5dc9) Thanks [@bryanph](https://github.com/bryanph)! - Upgrade next.js and source-map-loader packages
+
+## 0.81.2
+
+### Patch Changes
+
+- [#5045](https://github.com/ianstormtaylor/slate/pull/5045) [`0b2e6c79`](https://github.com/ianstormtaylor/slate/commit/0b2e6c79c08fc4eba32be7a424da758ba74573c3) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Don't native insert inside blocks with whitespace="pre" containing tab chars to work around https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
+
+* [#5046](https://github.com/ianstormtaylor/slate/pull/5046) [`f96b6597`](https://github.com/ianstormtaylor/slate/commit/f96b659755673375ef1b6a1cc925c73ce4934a03) Thanks [@BitPhinix](https://github.com/BitPhinix)! - fix macos accent menu when using arrow keys
+
+## 0.81.0
+
+### Minor Changes
+
+- [#4999](https://github.com/ianstormtaylor/slate/pull/4999) [`fe13a8f9`](https://github.com/ianstormtaylor/slate/commit/fe13a8f9e750569342ee004951e34233ab6614bf) Thanks [@alexandercampbell](https://github.com/alexandercampbell)! - Add new Slate.Scrubber interface to allow scrubbing end user data from exception
+  text. The default behavior remains unchanged.
+
+## 0.80.0
+
+### Patch Changes
+
+- [#5007](https://github.com/ianstormtaylor/slate/pull/5007) [`92c5730a`](https://github.com/ianstormtaylor/slate/commit/92c5730a96223a683b3c95651eb4c90a5caca21a) Thanks [@jasonphillips](https://github.com/jasonphillips)! - Revert #4876 & #4910 to restore original decorations behavior
+
+## 0.79.0
+
+### Minor Changes
+
+- [#4981](https://github.com/ianstormtaylor/slate/pull/4981) [`cb8a5515`](https://github.com/ianstormtaylor/slate/commit/cb8a551508c023346fd3aa0af1a5a80ffd6a37cd) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Add `ReactEditor.isComposing(editor)` to get the current `isComposing` state
+
 ## 0.78.1
 
 ### Patch Changes

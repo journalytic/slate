@@ -28,7 +28,7 @@ interface NodeOptions {
 
 - The `mode` option also filters the set of nodes.
 
-- When `voids` is false, [void Elements](./nodes/editor#schema-specific-instance-methods-to-override) are filtered out.
+- When `voids` is false, [void Elements](./nodes/editor.md#schema-specific-instance-methods-to-override) are filtered out.
 
 ## Static methods
 
@@ -101,7 +101,7 @@ Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `op
 
 Unset properties of nodes at the specified location. If no location is specified, use the selection.
 
-Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.liftNodes(editor: Editor, options?)`
 
